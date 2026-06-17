@@ -83,10 +83,15 @@ nav ul a:hover { color: var(--text); }
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;
-  gap: 4rem;
+  gap: 3rem;
   padding: 8rem 3rem 4rem;
   position: relative;
   overflow: hidden;
+}
+.hero-content {
+  width: 100%;
+  max-width: 560px;
+  justify-self: center;
 }
 .hero-glow {
   position: absolute;
@@ -228,6 +233,9 @@ nav ul a:hover { color: var(--text); }
   border-radius: 16px;
   overflow: hidden;
   position: relative;
+  width: 100%;
+  max-width: 900px;
+  justify-self: center;
   box-shadow: 0 24px 80px rgba(0,0,0,.28);
 }
 .report-card::after {
@@ -857,7 +865,7 @@ section { padding: 5.5rem 3rem; }
 .flow-track {
   display: flex; align-items: flex-start;
   justify-content: center;
-  overflow-x: auto; gap: .15rem; padding-bottom: .5rem;
+  overflow-x: auto; gap: .15rem; padding: .9rem 0 .5rem;
 }
 .flow-step {
   flex: 0 0 auto;
@@ -1328,7 +1336,7 @@ footer .f-mono {
   <div class="hero-glow"></div>
   <div class="hero-glow2"></div>
 
-  <div style="position:relative;z-index:1">
+  <div class="hero-content" style="position:relative;z-index:1">
     <div class="hero-badge">
       <div class="pulse-dot"></div>
       AI-разбор · 3–5 дней · до закупки GPU
