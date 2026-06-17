@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COSMO·RAG — Проверь до закупки GPU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #05070D;
+  --bg2:       #0B1020;
+  --card:      #111827;
+  --card2:     #0D1525;
+  --border:    #1E293B;
+  --border2:   #334155;
+  --text:      #F8FAFC;
+  --muted:     #94A3B8;
+  --dim:       #64748B;
+  --accent:    #38BDF8;
+  --green:     #22C55E;
+  --red:       #F87171;
+  --purple:    #A855F7;
+  --accent-dim:  rgba(56,189,248,.1);
+  --green-dim:   rgba(34,197,94,.08);
+  --purple-dim:  rgba(168,85,247,.08);
+  --red-dim:     rgba(248,113,113,.07);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── ICONS (inline SVG via bg-image workaround — we use CSS pseudo + data URIs) ── */
+/* We use simple geometric shapes as icons instead of emoji */
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 3rem;
+  height: 62px;
+  background: rgba(5,7,13,.9);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .95rem; font-weight: 600;
+  letter-spacing: .1em; color: var(--text);
+  text-decoration: none;
+}
+.logo .dot { color: var(--purple); }
+.logo .rag { color: var(--accent); }
+nav ul { list-style: none; display: flex; gap: 2rem; }
+nav ul a {
+  text-decoration: none; color: var(--muted);
+  font-size: .82rem; font-weight: 500;
+  letter-spacing: .02em; transition: color .15s;
+}
+nav ul a:hover { color: var(--text); }
+.nav-cta {
+  background: var(--accent); color: #020617;
+  padding: .42rem 1.1rem; border-radius: 7px;
+  font-size: .8rem; font-weight: 700;
+  text-decoration: none; letter-spacing: .01em;
+  transition: opacity .15s;
+}
+.nav-cta:hover { opacity: .85; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 4rem;
+  padding: 8rem 3rem 4rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero-glow {
+  position: absolute;
+  top: -300px; right: -300px;
+  width: 800px; height: 800px;
+  background: radial-gradient(circle, rgba(56,189,248,.055) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-glow2 {
+  position: absolute;
+  bottom: -200px; left: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(168,85,247,.03) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: var(--green-dim); border: 1px solid rgba(34,197,94,.2);
+  color: var(--green); padding: .28rem .8rem; border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem; font-weight: 500;
+  letter-spacing: .06em; margin-bottom: 1.5rem;
+}
+.pulse-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.25;} }
+
+.hero h1 {
+  font-size: clamp(1.9rem, 3.2vw, 2.8rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -.03em;
+  margin-bottom: 1.4rem;
+}
+.hero h1 em { font-style: normal; color: var(--accent); }
+
+.hero-body {
+  font-size: 1rem; color: var(--muted);
+  line-height: 1.75; max-width: 440px;
+  margin-bottom: .8rem;
+}
+.hero-result {
+  max-width: 510px;
+  color: var(--text);
+  font-size: .9rem;
+  line-height: 1.55;
+  margin-bottom: .45rem;
+}
+.hero-result strong { color: var(--accent); }
+.hero-small-note {
+  max-width: 510px;
+  color: var(--dim);
+  font-size: .76rem;
+  line-height: 1.55;
+  margin-bottom: 1.35rem;
+}
+
+.hero-outcomes {
+  background: rgba(255,255,255,.035);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  max-width: 510px;
+  margin: 0 0 1.45rem;
+}
+.hero-outcomes-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .64rem;
+  color: var(--accent);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: .65rem;
+}
+.hero-outcomes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .45rem .9rem;
+}
+.hero-outcome {
+  display: flex;
+  align-items: flex-start;
+  gap: .45rem;
+  font-size: .78rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.hero-outcome span {
+  color: var(--green);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.hero-pills {
+  display: flex; flex-direction: column; gap: .45rem;
+  margin-bottom: 2.25rem;
+}
+.hero-pill {
+  display: flex; align-items: center; gap: .6rem;
+  font-size: .88rem; color: var(--muted);
+}
+.pill-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+}
+.pill-dot.green { background: var(--green); }
+.pill-dot.blue  { background: var(--accent); }
+
+.hero-btns { display: flex; gap: .875rem; flex-wrap: wrap; }
+
+.btn-primary {
+  background: var(--accent); color: #020617;
+  padding: .72rem 1.6rem; border-radius: 9px;
+  font-size: .9rem; font-weight: 700;
+  text-decoration: none; border: none; cursor: pointer;
+  transition: opacity .15s, transform .12s;
+  display: inline-block;
+}
+.btn-primary:hover { opacity: .87; transform: translateY(-1px); }
+
+.btn-secondary {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--border2);
+  padding: .72rem 1.6rem; border-radius: 9px;
+  font-size: .9rem; font-weight: 500;
+  text-decoration: none; cursor: pointer;
+  transition: border-color .15s, transform .12s;
+  display: inline-block;
+}
+.btn-secondary:hover { border-color: var(--dim); transform: translateY(-1px); }
+
+
+/* ── HERO REPORT CARD (hero right) ── */
+.report-card {
+  background: linear-gradient(180deg, rgba(17,24,39,.98) 0%, rgba(10,15,29,.98) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 24px 80px rgba(0,0,0,.28);
+}
+.report-card::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--green) 35%, var(--accent) 70%, transparent 100%);
+  opacity: .5;
+}
+.rc-header {
+  padding: .9rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: .75rem;
+}
+.rc-dots { display: flex; gap: 6px; }
+.rc-dot { width: 10px; height: 10px; border-radius: 50%; }
+.rc-dot.r { background: rgba(248,113,113,.5); }
+.rc-dot.y { background: rgba(250,204,21,.5); }
+.rc-dot.g { background: rgba(34,197,94,.5); }
+.rc-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .65rem; color: var(--dim);
+  letter-spacing: .08em;
+}
+.rc-status {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem;
+  color: var(--green);
+  border: 1px solid rgba(34,197,94,.25);
+  background: var(--green-dim);
+  padding: .16rem .45rem;
+  border-radius: 999px;
+}
+.rc-body { padding: 1.3rem 1.35rem 1.35rem; }
+.rc-verdict {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: center;
+  padding: 1.05rem 1.1rem;
+  border: 1px solid rgba(34,197,94,.2);
+  background: rgba(34,197,94,.055);
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+.rc-verdict-badge {
+  width: 82px; height: 82px;
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(34,197,94,.12);
+  border: 1px solid rgba(34,197,94,.35);
+  color: var(--green);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+.rc-verdict h3 { font-size: 1rem; margin-bottom: .25rem; }
+.rc-verdict p { color: var(--muted); font-size: .78rem; line-height: 1.55; }
+.rc-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .65rem;
+  margin-bottom: 1rem;
+}
+.rc-kpi {
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .8rem .85rem;
+}
+.rc-kpi-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .54rem;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: .35rem;
+}
+.rc-kpi-value {
+  font-size: 1.05rem;
+  font-weight: 750;
+  color: var(--text);
+}
+.rc-kpi-value.green { color: var(--green); }
+.rc-kpi-value.accent { color: var(--accent); }
+.rc-bars {
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  margin-bottom: 1rem;
+}
+.rc-bar-row {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  gap: .7rem;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .58rem;
+  color: var(--muted);
+}
+.rc-bar-track { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.rc-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--green)); }
+.rc-models {
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  overflow: hidden;
+}
+.rc-model-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: .8rem;
+  align-items: center;
+  padding: .62rem .85rem;
+  border-bottom: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .58rem;
+  color: var(--muted);
+}
+.rc-model-row:last-child { border-bottom: 0; }
+.rc-model-name { color: var(--text); font-weight: 600; }
+.rc-chip {
+  border-radius: 999px;
+  padding: .12rem .4rem;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid rgba(56,189,248,.22);
+}
+.rc-chip.good { background: var(--green-dim); color: var(--green); border-color: rgba(34,197,94,.25); }
+.rc-note {
+  margin-top: .9rem;
+  color: var(--dim);
+  font-size: .72rem;
+  line-height: 1.55;
+}
+.rc-demo-note {
+  margin: -.35rem 0 1rem;
+  color: var(--dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .58rem;
+  line-height: 1.5;
+}
+.rc-demo-note span { color: var(--accent); }
+/* ── PIPELINE CARD (hero right) ── */
+.pipeline-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+}
+.pipeline-card::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
+  opacity: .4;
+}
+.pc-header {
+  padding: .9rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: .75rem;
+}
+.pc-dots { display: flex; gap: 6px; }
+.pc-dot { width: 10px; height: 10px; border-radius: 50%; }
+.pc-dot.r { background: rgba(248,113,113,.5); }
+.pc-dot.y { background: rgba(250,204,21,.5); }
+.pc-dot.g { background: rgba(34,197,94,.5); }
+.pc-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .65rem; color: var(--dim);
+  letter-spacing: .08em;
+}
+.pc-status {
+  margin-left: auto;
+  display: flex; align-items: center; gap: .4rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem; color: var(--green);
+}
+
+/* pipeline flow */
+.pc-flow {
+  padding: 1.5rem 1.25rem 1rem;
+}
+.pc-steps {
+  display: flex; flex-direction: column; gap: 0;
+}
+.pc-step {
+  display: flex; align-items: center; gap: .875rem;
+  padding: .6rem .75rem;
+  border-radius: 8px;
+  transition: background .15s;
+}
+.pc-step:hover { background: rgba(255,255,255,.02); }
+.pc-step-icon {
+  width: 34px; height: 34px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.pc-step-icon svg { width: 16px; height: 16px; }
+.psi-blue   { background: var(--accent-dim); border: 1px solid rgba(56,189,248,.25); }
+.psi-purple { background: var(--purple-dim); border: 1px solid rgba(168,85,247,.25); }
+.psi-purple2{ background: rgba(168,85,247,.12); border: 1px solid rgba(168,85,247,.3); }
+.psi-green  { background: var(--green-dim); border: 1px solid rgba(34,197,94,.25); }
+.pc-step-body { flex: 1; }
+.pc-step-title { font-size: .8rem; font-weight: 600; margin-bottom: .1rem; }
+.pc-step-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem; color: var(--dim);
+}
+.pc-step-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .58rem; padding: .15rem .45rem;
+  border-radius: 4px; font-weight: 500;
+}
+.tag-blue { background: var(--accent-dim); color: var(--accent); }
+.tag-purple { background: var(--purple-dim); color: var(--purple); }
+.tag-green { background: var(--green-dim); color: var(--green); }
+
+.pc-connector {
+  width: 1px; height: 18px;
+  background: linear-gradient(to bottom, var(--border2), rgba(56,189,248,.3));
+  margin-left: calc(.75rem + 17px); /* align to icon center */
+}
+
+/* answer block */
+.pc-answer {
+  margin: .5rem 1.25rem 1.25rem;
+  background: rgba(34,197,94,.04);
+  border: 1px solid rgba(34,197,94,.18);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+}
+.pc-answer-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem; color: var(--green);
+  letter-spacing: .06em; margin-bottom: .5rem;
+}
+.pc-answer-q {
+  font-size: .78rem; color: var(--muted);
+  margin-bottom: .6rem; padding-bottom: .6rem;
+  border-bottom: 1px solid var(--border);
+}
+.pc-answer-q span { color: var(--text); font-weight: 500; }
+.pc-answer-text {
+  font-size: .78rem; color: var(--text);
+  line-height: 1.6; margin-bottom: .6rem;
+}
+.pc-answer-src {
+  display: flex; align-items: center; gap: .5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .58rem; color: var(--dim);
+}
+.pc-answer-src span { color: var(--accent); }
+
+/* mobile pipeline */
+.pipeline-mobile {
+  display: none;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin: 1.5rem 0 0;
+}
+.mob-flow {
+  display: flex; align-items: center; gap: 0;
+}
+.mob-step {
+  flex: 1; text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem; color: var(--muted);
+  padding: .5rem .25rem;
+}
+.mob-step strong { color: var(--text); display: block; font-size: .65rem; margin-bottom: .2rem; }
+.mob-arrow {
+  color: var(--accent); font-size: .8rem;
+  padding: 0 .15rem;
+}
+
+/* ── SECTIONS ── */
+section { padding: 5.5rem 3rem; }
+.s-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .68rem; color: var(--accent);
+  letter-spacing: .12em; text-transform: uppercase;
+  margin-bottom: .6rem;
+}
+.s-title {
+  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+  font-weight: 700; line-height: 1.18;
+  letter-spacing: -.025em;
+  margin-bottom: .875rem;
+}
+.s-sub {
+  font-size: .97rem; color: var(--muted);
+  max-width: 520px; line-height: 1.7;
+  margin-bottom: 3rem;
+}
+.bg2 { background: var(--bg2); }
+
+/* ── ROADMAP ── */
+.roadmap-section {
+  padding-top: 3.8rem;
+  padding-bottom: 3.8rem;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  border-top: 1px solid rgba(255,255,255,.03);
+  border-bottom: 1px solid var(--border);
+}
+.roadmap-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+.roadmap-head .s-sub { margin-bottom: 0; }
+.roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: .8rem;
+  position: relative;
+}
+.roadmap-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.1rem 1rem;
+  position: relative;
+  overflow: hidden;
+}
+.roadmap-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent), rgba(34,197,94,.7));
+  opacity: .55;
+}
+.roadmap-day {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .58rem;
+  color: var(--accent);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: .65rem;
+}
+.roadmap-card h4 {
+  font-size: .86rem;
+  font-weight: 650;
+  margin-bottom: .35rem;
+}
+.roadmap-card p {
+  color: var(--muted);
+  font-size: .75rem;
+  line-height: 1.5;
+}
+
+/* ── FOR WHOM ── */
+.whom-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+}
+.whom-col h3 {
+  font-size: .75rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  margin-bottom: 1.25rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.whom-col.fits h3 { color: var(--green); }
+.whom-col.nofits h3 { color: var(--red); }
+.whom-list { list-style: none; display: flex; flex-direction: column; gap: .65rem; }
+.whom-list li {
+  display: flex; align-items: flex-start; gap: .7rem;
+  font-size: .88rem; color: var(--muted); line-height: 1.55;
+}
+.whom-icon {
+  width: 18px; height: 18px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .65rem; font-weight: 700;
+  flex-shrink: 0; margin-top: .15rem;
+}
+.whom-icon.yes { background: var(--green-dim); color: var(--green); border: 1px solid rgba(34,197,94,.2); }
+.whom-icon.no  { background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,113,113,.2); }
+
+/* divider */
+.whom-divider {
+  width: 1px; background: var(--border);
+  align-self: stretch; margin: 0 .5rem;
+}
+
+/* ── CLOUD vs LOCAL ── */
+.compare-wrap {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.compare-side { padding: 2.25rem 2rem; }
+.compare-side.cloud { background: rgba(248,113,113,.03); }
+.compare-side.local { background: rgba(34,197,94,.03); }
+.compare-side h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .68rem; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.compare-side.cloud h3 { color: var(--red); }
+.compare-side.local h3 { color: var(--green); }
+.cmp-item {
+  display: flex; align-items: flex-start; gap: .7rem;
+  margin-bottom: 1.1rem;
+}
+.cmp-marker {
+  width: 18px; height: 18px; border-radius: 4px;
+  flex-shrink: 0; margin-top: .15rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.cmp-marker svg { width: 10px; height: 10px; }
+.cmp-m-red  { background: var(--red-dim); border: 1px solid rgba(248,113,113,.2); }
+.cmp-m-green{ background: var(--green-dim); border: 1px solid rgba(34,197,94,.2); }
+.cmp-body {}
+.cmp-title { font-size: .87rem; font-weight: 600; margin-bottom: .15rem; }
+.cmp-desc  { font-size: .78rem; color: var(--muted); line-height: 1.5; }
+.compare-vs {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg2); border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+  padding: 0 1rem;
+}
+.vs-pill {
+  background: var(--card); border: 1px solid var(--border2);
+  color: var(--dim); border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .65rem; font-weight: 600;
+  padding: .3rem .5rem;
+}
+
+.compare-note {
+  margin-top: 1rem;
+  color: var(--dim);
+  font-size: .76rem;
+  line-height: 1.55;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.025);
+  border-radius: 10px;
+  padding: .8rem 1rem;
+}
+.compare-note strong { color: var(--text); }
+
+/* ── USE CASES ── */
+.use-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: .875rem;
+}
+.use-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 1.25rem 1.4rem;
+  display: flex; align-items: flex-start; gap: .875rem;
+  transition: border-color .2s, transform .15s;
+}
+.use-card:hover { border-color: rgba(56,189,248,.25); transform: translateY(-2px); }
+.use-icon {
+  width: 34px; height: 34px; border-radius: 7px;
+  background: var(--accent-dim); border: 1px solid rgba(56,189,248,.2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.use-icon svg { width: 16px; height: 16px; stroke: var(--accent); fill: none; stroke-width: 1.6; }
+.use-card h4 { font-size: .87rem; font-weight: 600; margin-bottom: .3rem; }
+.use-card p  { font-size: .77rem; color: var(--muted); line-height: 1.55; }
+
+.pilot-examples {
+  margin-top: 2rem;
+  background: rgba(255,255,255,.025);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.6rem;
+}
+.pilot-examples h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: .35rem;
+}
+.pilot-examples .sub {
+  color: var(--muted);
+  font-size: .82rem;
+  margin-bottom: 1.1rem;
+}
+.pilot-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: .75rem;
+}
+.pilot-card {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+}
+.pilot-card strong {
+  display: block;
+  font-size: .8rem;
+  margin-bottom: .35rem;
+}
+.pilot-card p {
+  font-size: .72rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ── DEMO ANSWER ── */
+.demo-wrap {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;
+}
+.demo-terminal {
+  background: #070C18;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.dt-header {
+  padding: .75rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: .6rem;
+}
+.dt-dots { display: flex; gap: 5px; }
+.dt-dot { width: 10px; height: 10px; border-radius: 50%; }
+.dt-dot.r { background: rgba(248,113,113,.5); }
+.dt-dot.y { background: rgba(250,204,21,.5); }
+.dt-dot.g { background: rgba(34,197,94,.5); }
+.dt-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem; color: var(--dim);
+  margin-left: .25rem;
+}
+.dt-body { padding: 1.25rem; }
+.dt-row { margin-bottom: 1.1rem; }
+.dt-key {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem; color: var(--dim);
+  letter-spacing: .06em; margin-bottom: .3rem;
+}
+.dt-val {
+  font-size: .82rem; color: var(--muted);
+  line-height: 1.6;
+}
+.dt-val.q { color: var(--text); font-weight: 500; }
+.dt-answer {
+  font-size: .82rem; color: var(--text); line-height: 1.7;
+  padding: .75rem; background: rgba(255,255,255,.03);
+  border-radius: 7px; border: 1px solid var(--border);
+}
+.dt-answer em {
+  color: var(--accent); font-style: normal;
+  font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+}
+.dt-src {
+  display: flex; flex-wrap: wrap; gap: .5rem;
+  margin-top: .875rem;
+}
+.dt-src-chip {
+  display: flex; align-items: center; gap: .35rem;
+  background: var(--accent-dim); border: 1px solid rgba(56,189,248,.2);
+  border-radius: 5px; padding: .2rem .5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .58rem; color: var(--accent);
+}
+.dt-conf {
+  display: flex; align-items: center; gap: .5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem; color: var(--dim);
+  margin-top: .75rem;
+}
+.conf-bar {
+  flex: 1; height: 3px; background: var(--border); border-radius: 2px;
+}
+.conf-fill {
+  height: 100%; border-radius: 2px; background: var(--green); width: 72%;
+}
+
+.demo-right { display: flex; flex-direction: column; gap: 1.25rem; }
+.demo-point {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 1.1rem 1.25rem;
+}
+.demo-point h4 { font-size: .87rem; font-weight: 600; margin-bottom: .3rem; }
+.demo-point p  { font-size: .78rem; color: var(--muted); line-height: 1.55; }
+
+.source-preview {
+  background: #070C18;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 1rem 1.05rem;
+}
+.source-preview-top {
+  display: flex;
+  justify-content: space-between;
+  gap: .8rem;
+  margin-bottom: .7rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .58rem;
+  color: var(--dim);
+}
+.source-preview-top span { color: var(--accent); }
+.source-preview-doc {
+  color: var(--muted);
+  font-size: .75rem;
+  line-height: 1.65;
+  border-left: 2px solid rgba(56,189,248,.35);
+  padding-left: .8rem;
+}
+.source-preview-doc mark {
+  background: rgba(56,189,248,.16);
+  color: var(--text);
+  border: 1px solid rgba(56,189,248,.22);
+  border-radius: 4px;
+  padding: .03rem .18rem;
+}
+
+/* ── HOW ── */
+.flow-track {
+  display: flex; align-items: flex-start;
+  overflow-x: auto; gap: 0; padding-bottom: .5rem;
+}
+.flow-step {
+  flex: 0 0 auto;
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 120px;
+}
+.flow-box {
+  width: 108px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .875rem .75rem;
+  text-align: center;
+  position: relative;
+}
+.flow-num {
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  background: var(--bg2); border: 1px solid var(--border2);
+  color: var(--accent); font-family: 'JetBrains Mono', monospace;
+  font-size: .58rem; font-weight: 600;
+  padding: .08rem .35rem; border-radius: 100px;
+}
+.flow-ico {
+  width: 32px; height: 32px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto .5rem;
+}
+.flow-ico svg { width: 16px; height: 16px; fill: none; stroke-width: 1.5; }
+.fbi-blue   { background: var(--accent-dim); }
+.fbi-blue svg { stroke: var(--accent); }
+.fbi-purple { background: var(--purple-dim); }
+.fbi-purple svg { stroke: var(--purple); }
+.fbi-green  { background: var(--green-dim); }
+.fbi-green svg { stroke: var(--green); }
+.flow-box-title { font-size: .78rem; font-weight: 600; margin-bottom: .2rem; }
+.flow-box-sub   { font-family: 'JetBrains Mono', monospace; font-size: .57rem; color: var(--dim); }
+.flow-arrow {
+  display: flex; align-items: center;
+  padding: 0 2px;
+  margin-top: 38px;
+}
+.flow-arrow-line {
+  height: 1px; width: 32px;
+  background: linear-gradient(90deg, var(--border2), rgba(56,189,248,.5));
+  position: relative;
+}
+.flow-arrow-line::after {
+  content: '';
+  position: absolute; right: -1px; top: -3px;
+  border: 4px solid transparent;
+  border-left: 5px solid rgba(56,189,248,.5);
+}
+
+/* ── BEFORE / AFTER ── */
+.ba-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+}
+.ba-col {
+  border-radius: 12px; padding: 1.75rem;
+  border: 1px solid var(--border);
+}
+.ba-col.before { background: var(--red-dim); border-color: rgba(248,113,113,.15); }
+.ba-col.after  { background: var(--green-dim); border-color: rgba(34,197,94,.15); }
+.ba-col h3 {
+  font-size: .72rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  margin-bottom: 1.1rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.ba-col.before h3 { color: var(--red); }
+.ba-col.after h3  { color: var(--green); }
+.ba-list { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+.ba-list li {
+  display: flex; align-items: flex-start; gap: .6rem;
+  font-size: .84rem; color: var(--muted); line-height: 1.5;
+}
+.ba-mark {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .65rem; font-weight: 700;
+  flex-shrink: 0; margin-top: .15rem;
+}
+.ba-mark.x { color: var(--red); }
+.ba-mark.v { color: var(--green); }
+
+.decision-card {
+  margin-top: 1.6rem;
+  background: linear-gradient(180deg, rgba(17,24,39,.92) 0%, rgba(13,21,37,.92) 100%);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.55rem;
+}
+.decision-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+.decision-head h3 { font-size: 1rem; font-weight: 700; }
+.decision-head span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem;
+  color: var(--green);
+  background: var(--green-dim);
+  border: 1px solid rgba(34,197,94,.22);
+  border-radius: 999px;
+  padding: .2rem .55rem;
+}
+.decision-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .8rem;
+}
+.decision-item {
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 1rem;
+  background: rgba(255,255,255,.025);
+}
+.decision-item strong {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .68rem;
+  letter-spacing: .06em;
+  margin-bottom: .45rem;
+}
+.decision-item.go strong { color: var(--green); }
+.decision-item.change strong { color: var(--accent); }
+.decision-item.stop strong { color: var(--red); }
+.decision-item p {
+  color: var(--muted);
+  font-size: .78rem;
+  line-height: 1.55;
+}
+
+/* ── PRE-BUY ── */
+.prebuy-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: .875rem;
+}
+.prebuy-card {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 1.2rem 1.4rem;
+  transition: border-color .2s;
+}
+.prebuy-card:hover { border-color: var(--border2); }
+.pq { font-family: 'JetBrains Mono', monospace; font-size: .6rem; color: var(--accent); margin-bottom: .35rem; letter-spacing: .04em; }
+.pa { font-size: .88rem; font-weight: 600; margin-bottom: .4rem; }
+.pn { font-size: .78rem; color: var(--muted); line-height: 1.55; }
+
+/* ── РАЗБОР (first paid step) ── */
+.razbor-wrap {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start;
+}
+.razbor-left h2 { margin-bottom: 1rem; }
+.razbor-left p { color: var(--muted); font-size: .95rem; line-height: 1.7; margin-bottom: 1.5rem; }
+.razbor-timeline { display: flex; flex-direction: column; gap: 0; }
+.rt-step {
+  display: flex; gap: 1rem; position: relative;
+}
+.rt-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 14px; top: 28px;
+  width: 1px; bottom: -8px;
+  background: var(--border);
+}
+.rt-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent-dim); border: 1px solid rgba(56,189,248,.3);
+  color: var(--accent); font-family: 'JetBrains Mono', monospace;
+  font-size: .65rem; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.rt-body { padding-bottom: 1.4rem; }
+.rt-body h4 { font-size: .87rem; font-weight: 600; margin-bottom: .25rem; }
+.rt-body p  { font-size: .78rem; color: var(--muted); line-height: 1.55; }
+.razbor-right {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 2rem;
+}
+.razbor-right h3 { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
+.razbor-right .sub { font-size: .82rem; color: var(--muted); margin-bottom: 1.5rem; }
+.deliv-list { list-style: none; display: flex; flex-direction: column; gap: .6rem; margin-bottom: 1.75rem; }
+.deliv-list li {
+  display: flex; align-items: flex-start; gap: .65rem;
+  font-size: .85rem; color: var(--muted); line-height: 1.5;
+}
+.deliv-check {
+  width: 18px; height: 18px; border-radius: 4px;
+  background: var(--green-dim); border: 1px solid rgba(34,197,94,.25);
+  color: var(--green); font-size: .6rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: .15rem;
+}
+.deliv-list li strong { color: var(--text); }
+
+.start-reqs {
+  margin-top: .6rem;
+  background: rgba(255,255,255,.025);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+.start-reqs h3 {
+  font-size: .9rem;
+  margin-bottom: .65rem;
+}
+.start-reqs ul {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .45rem .9rem;
+}
+.start-reqs li {
+  color: var(--muted);
+  font-size: .78rem;
+  line-height: 1.45;
+  display: flex;
+  gap: .45rem;
+}
+.start-reqs li::before {
+  content: '✓';
+  color: var(--green);
+  font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0;
+}
+.format-summary {
+  margin: 1rem 0 1.35rem;
+  background: rgba(56,189,248,.045);
+  border: 1px solid rgba(56,189,248,.18);
+  border-radius: 12px;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem .9rem;
+}
+.format-summary div {
+  display: flex;
+  flex-direction: column;
+  gap: .18rem;
+}
+.format-summary span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .54rem;
+  color: var(--accent);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.format-summary strong {
+  color: var(--text);
+  font-size: .8rem;
+  line-height: 1.35;
+}
+
+/* ── TRUST ── */
+.trust-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .875rem;
+}
+.trust-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 1.2rem 1.35rem;
+}
+.trust-card .trust-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .58rem;
+  color: var(--accent);
+  letter-spacing: .08em;
+  margin-bottom: .45rem;
+}
+.trust-card h4 {
+  font-size: .88rem;
+  font-weight: 650;
+  margin-bottom: .35rem;
+}
+.trust-card p {
+  font-size: .78rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+/* ── CTA BRIEF ── */
+.cta-brief {
+  margin: 2rem auto 0;
+  max-width: 680px;
+  background: rgba(255,255,255,.035);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.35rem 1.5rem;
+  text-align: left;
+}
+.cta-brief h3 {
+  font-size: .95rem;
+  margin-bottom: .35rem;
+}
+.cta-brief p {
+  color: var(--muted);
+  font-size: .8rem;
+  margin-bottom: .85rem;
+}
+.cta-brief ol {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .5rem .85rem;
+  counter-reset: brief;
+}
+.cta-brief li {
+  counter-increment: brief;
+  color: var(--muted);
+  font-size: .78rem;
+  line-height: 1.45;
+  display: flex;
+  gap: .45rem;
+}
+.cta-brief li::before {
+  content: counter(brief) '.';
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* ── CTA ── */
+.cta-section {
+  text-align: center;
+  padding: 6rem 3rem;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.cta-glow {
+  position: absolute;
+  top: -200px; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(56,189,248,.05) 0%, transparent 65%);
+  pointer-events: none;
+}
+.cta-badge {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: var(--green-dim); border: 1px solid rgba(34,197,94,.22);
+  color: var(--green); padding: .28rem .85rem; border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .68rem; font-weight: 500;
+  letter-spacing: .06em; margin-bottom: 1.75rem;
+}
+.cta-title {
+  font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+  font-weight: 800; line-height: 1.12;
+  letter-spacing: -.03em;
+  max-width: 600px; margin: 0 auto 1.1rem;
+}
+.cta-sub {
+  color: var(--muted); max-width: 460px;
+  margin: 0 auto 2.25rem;
+  font-size: .95rem; line-height: 1.7;
+}
+.cta-tg {
+  display: inline-flex; align-items: center; gap: .6rem;
+  background: var(--accent); color: #020617;
+  padding: .8rem 2rem; border-radius: 10px;
+  font-size: .95rem; font-weight: 700;
+  text-decoration: none;
+  transition: opacity .15s, transform .12s;
+}
+.cta-tg:hover { opacity: .87; transform: translateY(-2px); }
+.cta-tg svg { width: 18px; height: 18px; }
+.cta-alt {
+  margin-top: 1.1rem;
+  font-size: .8rem; color: var(--dim);
+}
+.cta-alt a {
+  color: var(--muted); text-decoration: none;
+  border-bottom: 1px solid var(--border2);
+}
+.cta-alt a:hover { color: var(--text); border-color: var(--muted); }
+
+/* ── FOOTER ── */
+footer {
+  padding: 1.75rem 3rem;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem;
+}
+footer .logo { font-size: .85rem; }
+footer .f-text { font-size: .78rem; color: var(--dim); }
+footer .f-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .65rem; color: var(--border2);
+  letter-spacing: .04em;
+}
+
+/* ── STARS ── */
+.star-field { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.star {
+  position: absolute; width: 1px; height: 1px;
+  background: #fff; border-radius: 50%; opacity: 0;
+  animation: twinkle var(--d) ease-in-out var(--dl) infinite;
+}
+@keyframes twinkle { 0%,100%{opacity:0;} 50%{opacity:var(--b);} }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 960px) {
+  nav { padding: 0 1.5rem; }
+  nav ul { display: none; }
+  .hero { grid-template-columns: 1fr; padding: 6.5rem 1.5rem 3rem; gap: 0; }
+  .hero .pipeline-card { display: none; }
+  .pipeline-mobile { display: block; }
+  section { padding: 4rem 1.5rem; }
+  .whom-grid { grid-template-columns: 1fr; }
+  .whom-divider { display: none; }
+  .compare-wrap { grid-template-columns: 1fr; }
+  .compare-vs { border: none; padding: .5rem; }
+  .use-grid { grid-template-columns: 1fr 1fr; }
+  .pilot-grid { grid-template-columns: 1fr 1fr; }
+  .trust-grid { grid-template-columns: 1fr 1fr; }
+  .roadmap-head { align-items: flex-start; flex-direction: column; }
+  .roadmap-grid { grid-template-columns: 1fr 1fr; }
+  .decision-grid { grid-template-columns: 1fr; }
+  .rc-kpi-grid { grid-template-columns: 1fr 1fr; }
+  .start-reqs ul { grid-template-columns: 1fr; }
+  .demo-wrap { grid-template-columns: 1fr; }
+  .ba-grid { grid-template-columns: 1fr; }
+  .prebuy-grid { grid-template-columns: 1fr 1fr; }
+  .razbor-wrap { grid-template-columns: 1fr; }
+  footer { flex-direction: column; text-align: center; }
+}
+@media (max-width: 600px) {
+  .use-grid { grid-template-columns: 1fr; }
+  .pilot-grid { grid-template-columns: 1fr; }
+  .trust-grid { grid-template-columns: 1fr; }
+  .roadmap-grid { grid-template-columns: 1fr; }
+  .cta-brief ol { grid-template-columns: 1fr; }
+  .prebuy-grid { grid-template-columns: 1fr; }
+  .hero-outcomes-grid { grid-template-columns: 1fr; }
+  .rc-kpi-grid { grid-template-columns: 1fr; }
+  .rc-verdict { grid-template-columns: 1fr; }
+  .format-summary { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 1.75rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">COSMO<span class="dot">·</span><span class="rag">RAG</span></a>
+  <ul>
+    <li><a href="#for-whom">Для кого</a></li>
+    <li><a href="#scenarios">Сценарии</a></li>
+    <li><a href="#razbor">Разбор</a></li>
+    <li><a href="#cta">Контакт</a></li>
+  </ul>
+  <a href="#cta" class="nav-cta">Запросить разбор</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="star-field" id="stars"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+
+  <div style="position:relative;z-index:1">
+    <div class="hero-badge">
+      <div class="pulse-dot"></div>
+      AI-разбор · 3–5 дней · до закупки GPU
+    </div>
+    <h1>Не покупайте сервер<br>под ИИ <em>вслепую</em></h1>
+    <p class="hero-body">
+      За 3–5 дней проверим на ваших документах, какие задачи реально может решить небольшая локальная LLM, и дадим технический вывод: покупать GPU, менять архитектуру или не тратить деньги.
+    </p>
+    <p class="hero-result"><strong>Итог разбора:</strong> покупать GPU, менять архитектуру или остановиться без лишних затрат.</p>
+    <p class="hero-small-note">3–5 дней — при готовом корпусе документов и согласованном доступе к данным.</p>
+    <div class="hero-outcomes">
+      <div class="hero-outcomes-title">За 3–5 дней вы получите</div>
+      <div class="hero-outcomes-grid">
+        <div class="hero-outcome"><span>✓</span>3–5 проверенных сценариев</div>
+        <div class="hero-outcome"><span>✓</span>прототип на ваших данных</div>
+        <div class="hero-outcome"><span>✓</span>оценку качества ответов</div>
+        <div class="hero-outcome"><span>✓</span>требования к GPU/RAM</div>
+        <div class="hero-outcome"><span>✓</span>риски и ограничения</div>
+        <div class="hero-outcome"><span>✓</span>решение: идти дальше / не идти</div>
+      </div>
+    </div>
+    <div class="hero-pills">
+      <div class="hero-pill"><div class="pill-dot green"></div>Данные не передаются во внешние AI-сервисы</div>
+      <div class="hero-pill"><div class="pill-dot blue"></div>Пилот на ваших документах, не на демо-данных</div>
+      <div class="hero-pill"><div class="pill-dot green"></div>Требования к железу — после проверки, не до</div>
+    </div>
+    <div class="hero-btns">
+      <a href="#cta" class="btn-primary">Запросить AI-разбор</a>
+      <a href="#scenarios" class="btn-secondary">Посмотреть сценарии</a>
+    </div>
+
+    <!-- mobile pipeline -->
+    <div class="pipeline-mobile">
+      <div class="mob-flow">
+        <div class="mob-step"><strong>Документы</strong>PDF/DOCX</div>
+        <div class="mob-arrow">→</div>
+        <div class="mob-step"><strong>RAG-поиск</strong>FAISS+BM25</div>
+        <div class="mob-arrow">→</div>
+        <div class="mob-step"><strong>Small LLM</strong>локально</div>
+        <div class="mob-arrow">→</div>
+        <div class="mob-step"><strong>Ответ</strong>с источником</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORT CARD -->
+  <div style="position:relative;z-index:1">
+    <div class="report-card">
+      <div class="rc-header">
+        <div class="rc-dots">
+          <div class="rc-dot r"></div>
+          <div class="rc-dot y"></div>
+          <div class="rc-dot g"></div>
+        </div>
+        <div class="rc-title">cosmorag · example report</div>
+        <div class="rc-status">example report</div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-verdict">
+          <div class="rc-verdict-badge">GO</div>
+          <div>
+            <h3>Пример формата отчёта</h3>
+            <p>3 из 5 сценариев проходят порог качества. Железо можно планировать, но после уточнения нагрузки и прав доступа.</p>
+          </div>
+        </div>
+        <div class="rc-demo-note"><span>demo:</span> цифры в карточке — пример структуры отчёта, а не замеренный кейс.</div>
+        <div class="rc-kpi-grid">
+          <div class="rc-kpi">
+            <div class="rc-kpi-label">source match</div>
+            <div class="rc-kpi-value green">84%</div>
+          </div>
+          <div class="rc-kpi">
+            <div class="rc-kpi-label">p95 latency</div>
+            <div class="rc-kpi-value accent">6.8s</div>
+          </div>
+          <div class="rc-kpi">
+            <div class="rc-kpi-label">gpu target</div>
+            <div class="rc-kpi-value">24–32GB</div>
+          </div>
+        </div>
+        <div class="rc-bars">
+          <div class="rc-bar-row">
+            <span>retrieval</span>
+            <div class="rc-bar-track"><div class="rc-bar-fill" style="width:86%"></div></div>
+            <span>86%</span>
+          </div>
+          <div class="rc-bar-row">
+            <span>answerability</span>
+            <div class="rc-bar-track"><div class="rc-bar-fill" style="width:72%"></div></div>
+            <span>72%</span>
+          </div>
+          <div class="rc-bar-row">
+            <span>risk level</span>
+            <div class="rc-bar-track"><div class="rc-bar-fill" style="width:38%;background:linear-gradient(90deg,var(--red),var(--accent))"></div></div>
+            <span>medium</span>
+          </div>
+        </div>
+        <div class="rc-models">
+          <div class="rc-model-row">
+            <span class="rc-model-name">Qwen local</span><span>лучше по RAG</span><span class="rc-chip good">shortlist</span>
+          </div>
+          <div class="rc-model-row">
+            <span class="rc-model-name">Gemma local</span><span>быстрее</span><span class="rc-chip">compare</span>
+          </div>
+          <div class="rc-model-row">
+            <span class="rc-model-name">API baseline*</span><span>только согласованные / обезличенные данные</span><span class="rc-chip">optional</span>
+          </div>
+        </div>
+        <div class="rc-note">Идея пилота: сначала измеряем качество и нагрузку, потом решаем, стоит ли покупать GPU. *External API baseline — только на обезличенных или отдельно согласованных данных.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="roadmap-section" id="roadmap">
+  <div class="roadmap-head">
+    <div>
+      <div class="s-eyebrow">// 3–5 дней</div>
+      <h2 class="s-title">От документов до решения по железу</h2>
+    </div>
+    <p class="s-sub">Показываем не “демо ради демо”, а короткий инженерный цикл с понятным результатом.</p>
+  </div>
+  <div class="roadmap-grid">
+    <div class="roadmap-card">
+      <div class="roadmap-day">день 1</div>
+      <h4>Бриф и сценарии</h4>
+      <p>Фиксируем 3–5 задач, ограничения безопасности и критерии успеха.</p>
+    </div>
+    <div class="roadmap-card">
+      <div class="roadmap-day">день 2</div>
+      <h4>Корпус документов</h4>
+      <p>Проверяем форматы, качество текста, структуру, OCR и обновляемость.</p>
+    </div>
+    <div class="roadmap-card">
+      <div class="roadmap-day">день 3</div>
+      <h4>Поиск и модели</h4>
+      <p>Собираем прототип, тестируем retrieval, reranker и локальные модели.</p>
+    </div>
+    <div class="roadmap-card">
+      <div class="roadmap-day">день 4</div>
+      <h4>Метрики и нагрузка</h4>
+      <p>Замеряем source match, latency, VRAM, слабые места и отказы.</p>
+    </div>
+    <div class="roadmap-card">
+      <div class="roadmap-day">день 5</div>
+      <h4>Go / no-go отчёт</h4>
+      <p>Даём решение: покупать GPU, менять архитектуру или не тратить бюджет.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOR WHOM -->
+<section id="for-whom" class="bg2">
+  <div class="s-eyebrow">// для кого</div>
+  <h2 class="s-title">Кому подойдёт, кому нет</h2>
+  <p class="s-sub">Зрелая позиция: не всем нужна локальная LLM. Разберёмся честно.</p>
+  <div class="whom-grid">
+    <div class="whom-col fits">
+      <h3>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="var(--green)"/><path d="M4 7l2 2 4-4" stroke="var(--green)" stroke-width="1.3"/></svg>
+        Подойдёт
+      </h3>
+      <ul class="whom-list">
+        <li><div class="whom-icon yes">✓</div>Компаниям с внутренними документами, которые нельзя отправлять в облако</li>
+        <li><div class="whom-icon yes">✓</div>Производственным и инженерным командам с регламентами и НТД</li>
+        <li><div class="whom-icon yes">✓</div>Техподдержке и сервисным отделам с повторяющимися запросами</li>
+        <li><div class="whom-icon yes">✓</div>Организациям перед закупкой GPU-сервера или AI-инфраструктуры</li>
+        <li><div class="whom-icon yes">✓</div>Командам, которые хотят проверить локальный ИИ без большого внедрения</li>
+      </ul>
+    </div>
+    <div class="whom-divider"></div>
+    <div class="whom-col nofits">
+      <h3>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="var(--red)"/><path d="M4.5 4.5l5 5M9.5 4.5l-5 5" stroke="var(--red)" stroke-width="1.3"/></svg>
+        Не подойдёт
+      </h3>
+      <ul class="whom-list">
+        <li><div class="whom-icon no">✕</div>Если хотите «ChatGPT обо всём» без конкретной задачи</li>
+        <li><div class="whom-icon no">✕</div>Если нет документов или данных для теста — демо-данные не считаются</li>
+        <li><div class="whom-icon no">✕</div>Если нужен публичный чат-бот для маркетинга или внешних пользователей</li>
+        <li><div class="whom-icon no">✕</div>Если ждёте магии без измерения качества</li>
+        <li><div class="whom-icon no">✕</div>Если не готовы выделить конкретный процесс для пилота</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CLOUD vs LOCAL -->
+<section>
+  <div class="s-eyebrow">// периметр</div>
+  <h2 class="s-title">Закрытый контур, а не облако</h2>
+  <p class="s-sub">Принципиальное отличие: при локальном развёртывании данные не передаются во внешние AI-сервисы.</p>
+  <div class="compare-wrap">
+    <div class="compare-side cloud">
+      <h3>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 9a3 3 0 1 1 0-6 3.5 3.5 0 0 1 6.93 1A2.5 2.5 0 0 1 9.5 9H3z" stroke="var(--red)" stroke-width="1.2"/></svg>
+        Публичные AI-сервисы
+      </h3>
+      <div class="cmp-item">
+        <div class="cmp-marker cmp-m-red">
+          <svg viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2L2 8" stroke="var(--red)" stroke-width="1.4"/></svg>
+        </div>
+        <div class="cmp-body">
+          <div class="cmp-title">Данные уходят во внешние сервисы</div>
+          <div class="cmp-desc">Запросы, документы и контекст обрабатываются на внешних серверах провайдера</div>
+        </div>
+      </div>
+      <div class="cmp-item">
+        <div class="cmp-marker cmp-m-red">
+          <svg viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2L2 8" stroke="var(--red)" stroke-width="1.4"/></svg>
+        </div>
+        <div class="cmp-body">
+          <div class="cmp-title">Риски при конфиденциальных документах</div>
+          <div class="cmp-desc">Сложно гарантировать условия обработки и хранения корпоративных данных</div>
+        </div>
+      </div>
+      <div class="cmp-item">
+        <div class="cmp-marker cmp-m-red">
+          <svg viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2L2 8" stroke="var(--red)" stroke-width="1.4"/></svg>
+        </div>
+        <div class="cmp-body">
+          <div class="cmp-title">Подписка растёт с объёмом</div>
+          <div class="cmp-desc">Зависимость от API-провайдера, лимиты запросов, переменная стоимость</div>
+        </div>
+      </div>
+      <div class="cmp-item">
+        <div class="cmp-marker cmp-m-red">
+          <svg viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2L2 8" stroke="var(--red)" stroke-width="1.4"/></svg>
+        </div>
+        <div class="cmp-body">
+          <div class="cmp-title">Не работает в изолированных контурах</div>
+          <div class="cmp-desc">Требует интернет-соединение, не подходит для закрытых корпоративных сетей</div>
+        </div>
+      </div>
+    </div>
+    <div class="compare-vs"><div class="vs-pill">VS</div></div>
+    <div class="compare-side local">
+      <h3>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="3" width="10" height="7" rx="1.5" stroke="var(--green)" stroke-width="1.2"/><path d="M4 3V2a2 2 0 0 1 4 0v1" stroke="var(--green)" stroke-width="1.2"/></svg>
+        COSMO·RAG
+      </h3>
+      <div class="cmp-item">
+        <div class="cmp-marker cmp-m-green">
+          <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 2" stroke="var(--green)" stroke-width="1.4"/></svg>
+        </div>
+        <div class="cmp-body">
+          <div class="cmp-title">Может быть развёрнут в локальном контуре</div>
+          <div class="cmp-desc">Модель, индекс и документы на вашем сервере — без выхода в интернет</div>
+        </div>
+      </div>
+      <div class="cmp-item">
+        <div class="cmp-marker cmp-m-green">
+          <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 2" stroke="var(--green)" stroke-width="1.4"/></svg>
+        </div>
+        <div class="cmp-body">
+          <div class="cmp-title">Данные не передаются во внешние AI-сервисы</div>
+          <div class="cmp-desc">Подходит для конфиденциальных и регуляторно чувствительных данных</div>
+        </div>
+      </div>
+      <div class="cmp-item">
+        <div class="cmp-marker cmp-m-green">
+          <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 2" stroke="var(--green)" stroke-width="1.4"/></svg>
+        </div>
+        <div class="cmp-body">
+          <div class="cmp-title">Можно снизить зависимость от внешних API</div>
+          <div class="cmp-desc">После закупки железа — предсказуемая стоимость без лимитов запросов</div>
+        </div>
+      </div>
+      <div class="cmp-item">
+        <div class="cmp-marker cmp-m-green">
+          <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 2" stroke="var(--green)" stroke-width="1.4"/></svg>
+        </div>
+        <div class="cmp-body">
+          <div class="cmp-title">Работает в изолированных сетях</div>
+          <div class="cmp-desc">Подходит для корпоративных, производственных и государственных контуров</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="compare-note"><strong>Важно:</strong> если для сравнения используется внешний API, данные предварительно обезличиваются или согласуются отдельно. Основной сценарий COSMO·RAG — локальная проверка без передачи корпоративных документов во внешние AI-сервисы.</div>
+</section>
+
+<!-- SCENARIOS -->
+<section id="scenarios" class="bg2">
+  <div class="s-eyebrow">// сценарии</div>
+  <h2 class="s-title">Что реально может небольшая LLM</h2>
+  <p class="s-sub">Не всё. Но конкретные задачи — хорошо. Это сценарии с измеримым результатом.</p>
+  <div class="use-grid">
+    <div class="use-card">
+      <div class="use-icon">
+        <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4"/><path d="M10.5 10.5L14 14"/></svg>
+      </div>
+      <div>
+        <h4>Поиск по документам</h4>
+        <p>RAG-поиск по внутренней базе: регламенты, НТД, инструкции. Ответ с указанием документа и страницы.</p>
+      </div>
+    </div>
+    <div class="use-card">
+      <div class="use-icon">
+        <svg viewBox="0 0 16 16"><path d="M2 4h12M2 8h8M2 12h5"/></svg>
+      </div>
+      <div>
+        <h4>Классификация заявок</h4>
+        <p>Автоматическая маршрутизация обращений по категориям, приоритетам и ответственным отделам.</p>
+      </div>
+    </div>
+    <div class="use-card">
+      <div class="use-icon">
+        <svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8h6M8 5v6"/></svg>
+      </div>
+      <div>
+        <h4>Извлечение данных</h4>
+        <p>Выгрузка структурированных полей из актов, договоров, отчётов в нужный формат.</p>
+      </div>
+    </div>
+    <div class="use-card">
+      <div class="use-icon">
+        <svg viewBox="0 0 16 16"><path d="M3 12V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v7"/><path d="M1 12h14"/></svg>
+      </div>
+      <div>
+        <h4>Черновики ответов</h4>
+        <p>Первый вариант ответа на типовые обращения на основе шаблонов и внутренних регламентов.</p>
+      </div>
+    </div>
+    <div class="use-card">
+      <div class="use-icon">
+        <svg viewBox="0 0 16 16"><path d="M2 5h12M2 8h8M2 11h10"/></svg>
+      </div>
+      <div>
+        <h4>Резюме документов</h4>
+        <p>Краткое изложение объёмных технических документов, протоколов совещаний, отчётов.</p>
+      </div>
+    </div>
+    <div class="use-card">
+      <div class="use-icon">
+        <svg viewBox="0 0 16 16"><path d="M8 2L2 6v8h4v-4h4v4h4V6L8 2z"/></svg>
+      </div>
+      <div>
+        <h4>Проверка регламентов</h4>
+        <p>Соответствие входящего текста внутренним стандартам. Флаги отклонений с указанием пункта.</p>
+      </div>
+    </div>
+  </div>
+  <div class="pilot-examples">
+    <h3>Примеры задач для пилота</h3>
+    <p class="sub">Чтобы ЛПР быстрее узнал свой процесс, сценарии формулируем не абстрактно, а через отдел и документы.</p>
+    <div class="pilot-grid">
+      <div class="pilot-card">
+        <strong>Производство</strong>
+        <p>Поиск по НТД, регламентам, инструкциям, технологическим картам.</p>
+      </div>
+      <div class="pilot-card">
+        <strong>Сервис</strong>
+        <p>Классификация обращений, черновики ответов, подсказки по базе знаний.</p>
+      </div>
+      <div class="pilot-card">
+        <strong>ИТ</strong>
+        <p>Поиск по инцидентам, логам, инструкциям, внутренним runbook.</p>
+      </div>
+      <div class="pilot-card">
+        <strong>Юристы и документооборот</strong>
+        <p>Извлечение условий, сверка шаблонов, поиск рисковых формулировок.</p>
+      </div>
+      <div class="pilot-card">
+        <strong>HR и обучение</strong>
+        <p>Ответы по внутренним регламентам, адаптации и корпоративным процедурам.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO ANSWER -->
+<section>
+  <div class="s-eyebrow">// как выглядит результат</div>
+  <h2 class="s-title">Не чёрный ящик — проверяемый ответ</h2>
+  <p class="s-sub">Каждый ответ содержит источник, страницу и оценку достаточности найденного контекста. Это важнее красивого интерфейса.</p>
+  <div class="demo-wrap">
+    <div class="demo-terminal">
+      <div class="dt-header">
+        <div class="dt-dots">
+          <div class="dt-dot r"></div>
+          <div class="dt-dot y"></div>
+          <div class="dt-dot g"></div>
+        </div>
+        <div class="dt-label">cosmorag · response</div>
+      </div>
+      <div class="dt-body">
+        <div class="dt-row">
+          <div class="dt-key">QUERY</div>
+          <div class="dt-val q">Как согласовать заявку на оборудование?</div>
+        </div>
+        <div class="dt-row">
+          <div class="dt-key">ANSWER</div>
+          <div class="dt-answer">
+            Согласно регламенту <em>R-14 §3.2</em>, заявка проходит три этапа согласования:<br>
+            1. Инициатор подаёт форму ЗО-7<br>
+            2. Технический эксперт отдела проверяет соответствие<br>
+            3. Финансовое согласование — до 5 рабочих дней<br><br>
+            При стоимости выше 500 тыс. руб. требуется дополнительное согласование ГД.
+          </div>
+        </div>
+        <div class="dt-src">
+          <div class="dt-src-chip">
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4h6M4 1l3 3-3 3" stroke="var(--accent)" stroke-width="1.2"/></svg>
+            reglament_R14.pdf · стр. 7
+          </div>
+          <div class="dt-src-chip">
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4h6M4 1l3 3-3 3" stroke="var(--accent)" stroke-width="1.2"/></svg>
+            forma_ZO7.docx
+          </div>
+        </div>
+        <div class="dt-conf">
+          <span>context match</span>
+          <div class="conf-bar"><div class="conf-fill"></div></div>
+          <span style="color:var(--green);font-weight:600">72%</span>
+        </div>
+      </div>
+    </div>
+    <div class="demo-right">
+      <div class="demo-point">
+        <h4>Ответ ограничен найденными источниками</h4>
+        <p>Система должна опираться на найденный контекст. Если релевантного источника нет — она отказывается от ответа или показывает низкую достаточность контекста.</p>
+      </div>
+      <div class="demo-point">
+        <h4>Достаточность контекста</h4>
+        <p>Context match показывает не вероятность истинности ответа, а насколько найденные источники похожи на запрос и достаточны для ответа. Это помогает находить слабые места поиска.</p>
+      </div>
+      <div class="source-preview">
+        <div class="source-preview-top">
+          <span>reglament_R14.pdf · стр. 7</span>
+          <div>source preview</div>
+        </div>
+        <div class="source-preview-doc">
+          ...заявка на оборудование проходит <mark>три этапа согласования</mark>: инициатор, технический эксперт, финансовое согласование. Срок рассмотрения — <mark>до 5 рабочих дней</mark>...
+        </div>
+      </div>
+      <div class="demo-point">
+        <h4>Latency замеряется на пилоте</h4>
+        <p>Скорость ответа зависит от модели, объёма контекста и нагрузки. Измеряем P50/P95 на ваших реальных запросах — не на синтетических тестах.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="bg2">
+  <div class="s-eyebrow">// механика</div>
+  <h2 class="s-title">Как работает Космораг</h2>
+  <p class="s-sub">Прозрачная цепочка без магии. Каждый шаг измеряется и может быть заменён.</p>
+  <div class="flow-track">
+    <div class="flow-step">
+      <div class="flow-box">
+        <div class="flow-num">01</div>
+        <div class="flow-ico fbi-blue">
+          <svg viewBox="0 0 16 16"><path d="M3 2h7l3 3v9H3V2z"/><path d="M10 2v3h3"/></svg>
+        </div>
+        <div class="flow-box-title">Данные</div>
+        <div class="flow-box-sub">PDF · DOCX<br>TXT · HTML</div>
+      </div>
+    </div>
+    <div class="flow-arrow"><div class="flow-arrow-line"></div></div>
+    <div class="flow-step">
+      <div class="flow-box">
+        <div class="flow-num">02</div>
+        <div class="flow-ico fbi-blue">
+          <svg viewBox="0 0 16 16"><rect x="2" y="4" width="12" height="9" rx="1.5"/><path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/></svg>
+        </div>
+        <div class="flow-box-title">Индексация</div>
+        <div class="flow-box-sub">chunk · embed<br>FAISS + BM25</div>
+      </div>
+    </div>
+    <div class="flow-arrow"><div class="flow-arrow-line" style="background:linear-gradient(90deg,var(--border2),rgba(168,85,247,.5))"><span style="position:absolute;right:-1px;top:-3px;border:4px solid transparent;border-left:5px solid rgba(168,85,247,.5)"></span></div></div>
+    <div class="flow-step">
+      <div class="flow-box">
+        <div class="flow-num">03</div>
+        <div class="flow-ico fbi-purple">
+          <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4"/><path d="M10.5 10.5L14 14"/></svg>
+        </div>
+        <div class="flow-box-title">Retrieval</div>
+        <div class="flow-box-sub">hybrid search<br>reranker</div>
+      </div>
+    </div>
+    <div class="flow-arrow"><div class="flow-arrow-line" style="background:linear-gradient(90deg,var(--border2),rgba(168,85,247,.5))"><span style="position:absolute;right:-1px;top:-3px;border:4px solid transparent;border-left:5px solid rgba(168,85,247,.5)"></span></div></div>
+    <div class="flow-step">
+      <div class="flow-box" style="border-color:rgba(168,85,247,.3)">
+        <div class="flow-num" style="color:var(--purple);border-color:rgba(168,85,247,.3)">04</div>
+        <div class="flow-ico fbi-purple">
+          <svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M5 7h6M5 10h4"/></svg>
+        </div>
+        <div class="flow-box-title">Small LLM</div>
+        <div class="flow-box-sub" style="color:var(--purple)">локально<br>VRAM по задаче</div>
+      </div>
+    </div>
+    <div class="flow-arrow"><div class="flow-arrow-line" style="background:linear-gradient(90deg,var(--border2),rgba(34,197,94,.5))"><span style="position:absolute;right:-1px;top:-3px;border:4px solid transparent;border-left:5px solid rgba(34,197,94,.5)"></span></div></div>
+    <div class="flow-step">
+      <div class="flow-box" style="border-color:rgba(56,189,248,.25)">
+        <div class="flow-num">05</div>
+        <div class="flow-ico fbi-blue">
+          <svg viewBox="0 0 16 16"><path d="M2 5h12M2 8h8M2 11h6"/></svg>
+        </div>
+        <div class="flow-box-title">Ответ</div>
+        <div class="flow-box-sub">источник<br>context match</div>
+      </div>
+    </div>
+    <div class="flow-arrow"><div class="flow-arrow-line" style="background:linear-gradient(90deg,var(--border2),rgba(34,197,94,.5))"><span style="position:absolute;right:-1px;top:-3px;border:4px solid transparent;border-left:5px solid rgba(34,197,94,.5)"></span></div></div>
+    <div class="flow-step">
+      <div class="flow-box" style="border-color:rgba(34,197,94,.25)">
+        <div class="flow-num" style="color:var(--green);border-color:rgba(34,197,94,.3)">06</div>
+        <div class="flow-ico fbi-green">
+          <svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8l2 2 4-4"/></svg>
+        </div>
+        <div class="flow-box-title">Оценка</div>
+        <div class="flow-box-sub" style="color:var(--green)">метрики<br>качества</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BEFORE / AFTER -->
+<section>
+  <div class="s-eyebrow">// эффект пилота</div>
+  <h2 class="s-title">До пилота и после</h2>
+  <p class="s-sub">Главный результат — не прототип. Это понимание: идти дальше или нет.</p>
+  <div class="ba-grid">
+    <div class="ba-col before">
+      <h3>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="var(--red)"/><path d="M4 4l4 4M8 4L4 8" stroke="var(--red)" stroke-width="1.2"/></svg>
+        До Косморага
+      </h3>
+      <ul class="ba-list">
+        <li><span class="ba-mark x">–</span>Документы разбросаны по папкам и почте, поиск занимает часы</li>
+        <li><span class="ba-mark x">–</span>Сотрудники тратят время, переспрашивая друг друга</li>
+        <li><span class="ba-mark x">–</span>ИИ интересен, но непонятно, к какой задаче применить</li>
+        <li><span class="ba-mark x">–</span>Хотят купить GPU «на будущее» без понимания нагрузки</li>
+        <li><span class="ba-mark x">–</span>Нет данных, чтобы обосновать инвестицию перед руководством</li>
+      </ul>
+    </div>
+    <div class="ba-col after">
+      <h3>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="var(--green)"/><path d="M3 6l2.5 2.5L9 3" stroke="var(--green)" stroke-width="1.2"/></svg>
+        После пилота
+      </h3>
+      <ul class="ba-list">
+        <li><span class="ba-mark v">+</span>Список рабочих сценариев с измеренным качеством ответов</li>
+        <li><span class="ba-mark v">+</span>Список сценариев, где локальная модель не справляется — честно</li>
+        <li><span class="ba-mark v">+</span>Конкретные требования к железу: GPU, RAM, объём диска</li>
+        <li><span class="ba-mark v">+</span>Рабочий прототип на ваших документах и данных</li>
+        <li><span class="ba-mark v">+</span>Понятно: идти дальше и в каком объёме, или остановиться</li>
+      </ul>
+    </div>
+  </div>
+  <div class="decision-card">
+    <div class="decision-head">
+      <h3>Финальный формат вывода</h3>
+      <span>decision, not demo</span>
+    </div>
+    <div class="decision-grid">
+      <div class="decision-item go">
+        <strong>GO</strong>
+        <p>Сценарии работают, качество измерено, можно планировать закупку GPU и пилотное внедрение.</p>
+      </div>
+      <div class="decision-item change">
+        <strong>CHANGE</strong>
+        <p>Идея полезна, но нужна другая архитектура: внешний baseline, другой поиск, OCR или права доступа.</p>
+      </div>
+      <div class="decision-item stop">
+        <strong>NO-GO</strong>
+        <p>Локальная LLM не даёт нужного качества. Лучше не покупать железо под этот сценарий.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRE-BUY -->
+<section id="pilot" class="bg2">
+  <div class="s-eyebrow">// что проверяем</div>
+  <h2 class="s-title">Сначала сценарии. Потом железо.</h2>
+  <p class="s-sub">Каждый пилот отвечает на конкретные вопросы перед инвестицией.</p>
+  <div class="prebuy-grid">
+    <div class="prebuy-card">
+      <div class="pq">ВОПРОС_01</div>
+      <div class="pa">Какие модели тестировать?</div>
+      <div class="pn">Локально доступные и коммерчески применимые модели подбираются под задачу: Qwen, Gemma, Mistral и другие. При необходимости сравниваем с внешними API как baseline.</div>
+    </div>
+    <div class="prebuy-card">
+      <div class="pq">ВОПРОС_02</div>
+      <div class="pa">Сколько нужно VRAM?</div>
+      <div class="pn">VRAM подбирается по модели, контексту и нагрузке. Определяем на пилоте, не по спецификации.</div>
+    </div>
+    <div class="prebuy-card">
+      <div class="pq">ВОПРОС_03</div>
+      <div class="pa">Какая latency в вашем сценарии?</div>
+      <div class="pn">Latency замеряется на пилоте с реальными запросами. P50/P95 для вашей нагрузки.</div>
+    </div>
+    <div class="prebuy-card">
+      <div class="pq">ВОПРОС_04</div>
+      <div class="pa">Сколько пользователей одновременно?</div>
+      <div class="pn">Нагрузочный тест с vLLM на реальном числе concurrent users вашего отдела.</div>
+    </div>
+    <div class="prebuy-card">
+      <div class="pq">ВОПРОС_05</div>
+      <div class="pa">Нужен ли длинный контекст?</div>
+      <div class="pn">Если документы объёмные — тестируем модели с 32k+ контекстом против chunk-стратегий.</div>
+    </div>
+    <div class="prebuy-card">
+      <div class="pq">ВОПРОС_06</div>
+      <div class="pa">Как хранить и обновлять индекс?</div>
+      <div class="pn">FAISS, SQLite или Postgres — зависит от объёма корпуса и частоты добавления документов.</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- TRUST -->
+<section id="trust">
+  <div class="s-eyebrow">// почему нам можно доверять</div>
+  <h2 class="s-title">Мы не продаём “магический ИИ”</h2>
+  <p class="s-sub">Наша задача — инженерно проверить качество на ваших данных и честно показать, где локальная LLM полезна, а где нет.</p>
+  <div class="trust-grid">
+    <div class="trust-card">
+      <div class="trust-num">01</div>
+      <h4>Делаем локальные AI/RAG-прототипы</h4>
+      <p>Работаем с закрытым контуром, документами, поиском, индексами и ответами с источниками.</p>
+    </div>
+    <div class="trust-card">
+      <div class="trust-num">02</div>
+      <h4>Понимаем ограничения маленьких LLM</h4>
+      <p>Не обещаем “ИИ обо всём”: отдельно проверяем retrieval, модель, контекст, latency и отказ от ответа.</p>
+    </div>
+    <div class="trust-card">
+      <div class="trust-num">03</div>
+      <h4>Измеряем качество, а не впечатление</h4>
+      <p>Смотрим, нашёлся ли правильный источник, достаточно ли контекста и воспроизводим ли ответ на реальных запросах.</p>
+    </div>
+    <div class="trust-card">
+      <div class="trust-num">04</div>
+      <h4>Работаем с документами и инференсом</h4>
+      <p>Учитываем форматы файлов, OCR, обновление корпуса, права доступа, память GPU и нагрузку пользователей.</p>
+    </div>
+    <div class="trust-card">
+      <div class="trust-num">05</div>
+      <h4>Даём инженерный отчёт</h4>
+      <p>На выходе: модель, качество, latency, требования к железу, риски и решение go / no-go.</p>
+    </div>
+    <div class="trust-card">
+      <div class="trust-num">06</div>
+      <h4>Честно фиксируем “не работает”</h4>
+      <p>Если сценарий не проходит проверку, это тоже результат: лучше узнать это до закупки сервера.</p>
+    </div>
+  </div>
+</section>
+
+<!-- RAZBOR -->
+<section id="razbor">
+  <div class="s-eyebrow">// первый шаг</div>
+  <div class="razbor-wrap">
+    <div class="razbor-left">
+      <h2 class="s-title">AI-разбор перед закупкой железа</h2>
+      <p>За 3–5 рабочих дней проходим цикл от задачи до инженерной оценки — при готовом корпусе документов и согласованном доступе к данным. На выходе — go / no-go, требования к железу, прототип и список рисков.</p>
+      <div class="razbor-timeline">
+        <div class="rt-step">
+          <div class="rt-num">1</div>
+          <div class="rt-body">
+            <h4>Выбираем сценарии</h4>
+            <p>Разбираем 3–5 конкретных задач, где локальный ИИ может помочь. Не абстрактно — с реальными примерами входных данных.</p>
+          </div>
+        </div>
+        <div class="rt-step">
+          <div class="rt-num">2</div>
+          <div class="rt-body">
+            <h4>Проверяем корпус данных</h4>
+            <p>Смотрим на ваши документы: форматы, объём, структуру. Определяем, что реально можно проиндексировать.</p>
+          </div>
+        </div>
+        <div class="rt-step">
+          <div class="rt-num">3</div>
+          <div class="rt-body">
+            <h4>Подбираем и тестируем модели</h4>
+            <p>Запускаем 2–3 модели на ваших запросах. Замеряем качество, latency, потребление памяти.</p>
+          </div>
+        </div>
+        <div class="rt-step">
+          <div class="rt-num">4</div>
+          <div class="rt-body">
+            <h4>Считаем железо и показываем план</h4>
+            <p>Конкретные требования к GPU, RAM и хранилищу. Фазированный план, если идёте дальше.</p>
+          </div>
+        </div>
+      </div>
+      <div class="start-reqs">
+        <h3>Для запуска нужны</h3>
+        <ul>
+          <li>3–5 конкретных сценариев</li>
+          <li>20–50 типовых запросов</li>
+          <li>корпус документов</li>
+          <li>ограничения по безопасности</li>
+          <li>контакт технического ответственного</li>
+        </ul>
+      </div>
+    </div>
+    <div class="razbor-right">
+      <h3>Что вы получите</h3>
+      <p class="sub">Конкретный инженерный отчёт, не презентация про AI.</p>
+      <div class="format-summary">
+        <div><span>формат</span><strong>экспресс-разбор / пилот</strong></div>
+        <div><span>срок</span><strong>3–5 рабочих дней</strong></div>
+        <div><span>вход</span><strong>документы + 3–5 сценариев</strong></div>
+        <div><span>выход</span><strong>go / no-go отчёт</strong></div>
+        <div><span>стоимость</span><strong>по запросу после 15-минутного созвона</strong></div>
+      </div>
+      <ul class="deliv-list">
+        <li>
+          <div class="deliv-check">✓</div>
+          <div><strong>Список рабочих сценариев</strong> — где локальная LLM даёт приемлемое качество</div>
+        </li>
+        <li>
+          <div class="deliv-check">✓</div>
+          <div><strong>Список нерабочих сценариев</strong> — где не справляется, честно</div>
+        </li>
+        <li>
+          <div class="deliv-check">✓</div>
+          <div><strong>Требования к железу</strong> — GPU, RAM, диск под конкретную нагрузку</div>
+        </li>
+        <li>
+          <div class="deliv-check">✓</div>
+          <div><strong>Сравнение моделей</strong> — качество / latency / VRAM на ваших данных</div>
+        </li>
+        <li>
+          <div class="deliv-check">✓</div>
+          <div><strong>Рабочий прототип</strong> — RAG-система на ваших документах</div>
+        </li>
+        <li>
+          <div class="deliv-check">✓</div>
+          <div><strong>Решение go / no-go</strong> — идти дальше, менять архитектуру или не тратить бюджет</div>
+        </li>
+      </ul>
+      <a href="#cta" class="btn-primary" style="width:100%;text-align:center;display:block">Запросить разбор</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <div class="cta-glow"></div>
+  <div style="position:relative;z-index:1">
+    <div class="cta-badge"><div class="pulse-dot"></div> принимаем заявки на разбор</div>
+    <h2 class="cta-title">Стоит ли вашей компании<br>покупать сервер под локальный ИИ?</h2>
+    <p class="cta-sub">За 3–5 дней проверим 3–5 сценариев на ваших документах и дадим вывод: покупать GPU, менять архитектуру или остановиться.</p>
+    <a href="https://t.me/yuriispace" class="cta-tg" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.56 8.1l-2.02 9.52c-.15.66-.54.82-1.09.51l-3-2.21-1.45 1.4c-.16.16-.3.3-.61.3l.21-3.06 5.52-4.99c.24-.21-.05-.33-.37-.12L6.28 14.3 3.32 13.4c-.66-.2-.67-.66.14-.98l10.88-4.2c.55-.2 1.03.13.85.98l-.63-.1z"/></svg>
+      Проверить, стоит ли покупать GPU
+    </a>
+    <div class="cta-alt">или <a href="mailto:hello@cosmorag.ru">отправить письмо</a> — ответим в течение дня</div>
+    <div class="cta-brief">
+      <h3>Что написать в заявке</h3>
+      <p>Так мы быстрее поймём, подходит ли задача для короткого AI-разбора.</p>
+      <ol>
+        <li>Какая компания или отдел?</li>
+        <li>Какие документы хотите подключить?</li>
+        <li>Почему нельзя использовать облачные AI-сервисы?</li>
+        <li>Есть ли уже GPU, сервер или закрытый контур?</li>
+        <li>Какие 3 задачи хотите проверить первыми?</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="logo">COSMO<span class="dot">·</span><span class="rag">RAG</span></a>
+  <p class="f-text">AI-разбор локального контура. Go / no-go до закупки GPU.</p>
+  <p class="f-mono">v1.3 · ready for outreach · go/no-go</p>
+</footer>
+
+<script>
+const field = document.getElementById('stars');
+for (let i = 0; i < 90; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2.5+Math.random()*6}s;--dl:${Math.random()*8}s;--b:${.1+Math.random()*.4};`;
+  field.appendChild(s);
+}
+</script>
+</body>
+</html>
