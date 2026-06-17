@@ -584,7 +584,8 @@ section { padding: 5.5rem 3rem; }
 
 /* ── FOR WHOM ── */
 .whom-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
   gap: 2.5rem;
 }
 .whom-col h3 {
@@ -849,17 +850,22 @@ section { padding: 5.5rem 3rem; }
 }
 
 /* ── HOW ── */
+#how {
+  padding-top: 4.75rem;
+  padding-bottom: 4.75rem;
+}
 .flow-track {
   display: flex; align-items: flex-start;
-  overflow-x: auto; gap: 0; padding-bottom: .5rem;
+  justify-content: center;
+  overflow-x: auto; gap: .15rem; padding-bottom: .5rem;
 }
 .flow-step {
   flex: 0 0 auto;
   display: flex; flex-direction: column; align-items: center;
-  min-width: 120px;
+  min-width: 124px;
 }
 .flow-box {
-  width: 108px;
+  width: 116px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -890,11 +896,11 @@ section { padding: 5.5rem 3rem; }
 .flow-box-sub   { font-family: 'JetBrains Mono', monospace; font-size: .57rem; color: var(--dim); }
 .flow-arrow {
   display: flex; align-items: center;
-  padding: 0 2px;
+  padding: 0 4px;
   margin-top: 38px;
 }
 .flow-arrow-line {
-  height: 1px; width: 32px;
+  height: 1px; width: clamp(28px, 4vw, 70px);
   background: linear-gradient(90deg, var(--border2), rgba(56,189,248,.5));
   position: relative;
 }
@@ -2072,11 +2078,11 @@ footer .f-mono {
     <div class="cta-badge"><div class="pulse-dot"></div> принимаем заявки на разбор</div>
     <h2 class="cta-title">Стоит ли вашей компании<br>покупать сервер под локальный ИИ?</h2>
     <p class="cta-sub">За 3–5 дней проверим 3–5 сценариев на ваших документах и дадим вывод: покупать GPU, менять архитектуру или остановиться.</p>
-    <a href="https://t.me/yuriispace" class="cta-tg" target="_blank">
+    <a href="https://t.me/yuriiivanov36" class="cta-tg" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.56 8.1l-2.02 9.52c-.15.66-.54.82-1.09.51l-3-2.21-1.45 1.4c-.16.16-.3.3-.61.3l.21-3.06 5.52-4.99c.24-.21-.05-.33-.37-.12L6.28 14.3 3.32 13.4c-.66-.2-.67-.66.14-.98l10.88-4.2c.55-.2 1.03.13.85.98l-.63-.1z"/></svg>
       Проверить, стоит ли покупать GPU
     </a>
-    <div class="cta-alt">или <a href="mailto:hello@cosmorag.ru">отправить письмо</a> — ответим в течение дня</div>
+    <div class="cta-alt">или <a href="mailto:yurii.ivanov.2000@mail.ru">отправить письмо</a> — ответим в течение дня</div>
     <div class="cta-brief">
       <h3>Что написать в заявке</h3>
       <p>Так мы быстрее поймём, подходит ли задача для короткого AI-разбора.</p>
