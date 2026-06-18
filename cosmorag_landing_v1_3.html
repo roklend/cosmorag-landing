@@ -310,6 +310,10 @@ nav ul a:hover { color: var(--text); }
   border-radius: 12px;
   margin-bottom: 1rem;
 }
+.rc-verdict.change {
+  border-color: rgba(251,191,36,.24);
+  background: rgba(251,191,36,.065);
+}
 .rc-verdict-badge {
   width: 82px; height: 82px;
   border-radius: 18px;
@@ -321,6 +325,11 @@ nav ul a:hover { color: var(--text); }
   font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: .08em;
+}
+.rc-verdict.change .rc-verdict-badge {
+  background: rgba(251,191,36,.12);
+  border-color: rgba(251,191,36,.35);
+  color: #FBBF24;
 }
 .rc-verdict h3 { font-size: 1rem; margin-bottom: .25rem; }
 .rc-verdict p { color: var(--muted); font-size: .78rem; line-height: 1.55; }
@@ -475,6 +484,86 @@ nav ul a:hover { color: var(--text); }
   line-height: 1.5;
 }
 .rc-demo-note span { color: var(--accent); }
+
+.launch-status-strip {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .9rem;
+  position: relative;
+  z-index: 1;
+  max-width: 1120px;
+  width: 100%;
+  justify-self: center;
+  margin-top: .25rem;
+}
+.launch-card {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: rgba(255,255,255,.04);
+  backdrop-filter: blur(14px);
+  padding: 1.15rem 1.25rem;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+}
+.launch-card strong {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .72rem;
+  letter-spacing: .08em;
+  margin-bottom: .35rem;
+}
+.launch-card p {
+  color: var(--muted);
+  font-size: .84rem;
+  line-height: 1.45;
+}
+.launch-card.go strong { color: var(--green); }
+.launch-card.change strong { color: #FBBF24; }
+.launch-card.stop strong { color: var(--red); }
+
+.risk-panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+.risk-card {
+  min-height: 210px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 24% 0%, rgba(77,195,255,.10), transparent 36%),
+    rgba(255,255,255,.04);
+  backdrop-filter: blur(14px);
+  padding: 1.45rem;
+  position: relative;
+  overflow: hidden;
+}
+.risk-card::after {
+  content: '';
+  position: absolute;
+  left: 1.45rem;
+  right: 1.45rem;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), rgba(139,92,246,.65), transparent);
+  opacity: .7;
+}
+.risk-label {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent);
+  font-size: .62rem;
+  letter-spacing: .12em;
+  margin-bottom: 1.15rem;
+}
+.risk-card h3 {
+  font-size: 1.18rem;
+  margin-bottom: .7rem;
+}
+.risk-card p {
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: .88rem;
+}
 /* ── PIPELINE CARD (hero right) ── */
 .pipeline-card {
   background: var(--bg2);
@@ -949,6 +1038,17 @@ section { padding: 5.5rem 3rem; }
   grid-template-columns: repeat(5, 1fr);
   gap: .75rem;
 }
+.scenario-carousel {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(230px, 1fr);
+  overflow-x: auto;
+  padding-bottom: .65rem;
+  scroll-snap-type: x proximity;
+}
+.scenario-carousel .pilot-card {
+  scroll-snap-align: start;
+}
 .pilot-card {
   background: var(--card2);
   border: 1px solid var(--border);
@@ -1296,6 +1396,37 @@ section { padding: 5.5rem 3rem; }
   display: flex; align-items: flex-start;
   justify-content: center;
   overflow-x: auto; gap: .15rem; padding: .9rem 0 .5rem;
+  position: relative;
+}
+.flow-track::before {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(77,195,255,.38), rgba(139,92,246,.36), transparent);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.flow-track::after {
+  content: '';
+  position: absolute;
+  top: calc(50% - 4px);
+  left: 12%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 18px rgba(77,195,255,.85);
+  animation: dataPulse 5.5s linear infinite;
+  pointer-events: none;
+}
+@keyframes dataPulse {
+  from { left: 12%; opacity: .15; }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  to { left: 88%; opacity: .15; }
 }
 .flow-step {
   flex: 0 0 auto;
@@ -1310,6 +1441,7 @@ section { padding: 5.5rem 3rem; }
   padding: .875rem .75rem;
   text-align: center;
   position: relative;
+  z-index: 1;
 }
 .flow-num {
   position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
@@ -1348,10 +1480,66 @@ section { padding: 5.5rem 3rem; }
   border: 4px solid transparent;
   border-left: 5px solid rgba(56,189,248,.5);
 }
+.pipeline-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .8rem;
+  margin-top: 1rem;
+}
+.pipeline-metric {
+  border: 1px solid rgba(77,195,255,.14);
+  border-radius: 14px;
+  background: rgba(255,255,255,.035);
+  padding: .9rem 1rem;
+}
+.pipeline-metric span {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .56rem;
+  color: var(--dim);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: .25rem;
+}
+.pipeline-metric strong {
+  color: var(--text);
+  font-size: .96rem;
+}
 
 /* ── BEFORE / AFTER ── */
 .ba-grid {
   display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+}
+.ba-switch {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .75rem;
+  margin-bottom: 1.25rem;
+}
+.ba-switch-item {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255,255,255,.035);
+  padding: .9rem;
+}
+.ba-switch-item span {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--dim);
+  font-size: .55rem;
+  letter-spacing: .08em;
+  margin-bottom: .3rem;
+}
+.ba-switch-item strong {
+  color: var(--text);
+  font-size: .84rem;
+}
+.ba-switch-item em {
+  display: block;
+  font-style: normal;
+  color: var(--accent);
+  margin-top: .25rem;
+  font-size: .8rem;
 }
 .ba-col {
   border-radius: 12px; padding: 1.75rem;
@@ -1717,8 +1905,10 @@ footer .f-mono {
   .whom-divider { display: none; }
   .compare-wrap { grid-template-columns: 1fr; }
   .compare-vs { border: none; padding: .5rem; }
+  .risk-panel { grid-template-columns: 1fr; }
   .use-grid { grid-template-columns: 1fr 1fr; }
   .pilot-grid { grid-template-columns: 1fr 1fr; }
+  .scenario-carousel { grid-template-columns: none; grid-auto-columns: minmax(240px, 46vw); }
   .trust-grid { grid-template-columns: 1fr 1fr; }
   .roadmap-head { align-items: flex-start; flex-direction: column; }
   .roadmap-grid { grid-template-columns: 1fr 1fr; }
@@ -1727,6 +1917,9 @@ footer .f-mono {
   .rc-orbit { grid-template-columns: 1fr 1fr; }
   .report-showcase { grid-template-columns: 1fr; }
   .diagnostic-board { grid-template-columns: 1fr 1fr; }
+  .pipeline-metrics { grid-template-columns: 1fr 1fr; }
+  .launch-status-strip { grid-template-columns: 1fr; }
+  .ba-switch { grid-template-columns: 1fr 1fr; }
   .start-qualifier { grid-template-columns: 1fr; }
   .start-reqs ul { grid-template-columns: 1fr; }
   .demo-wrap { grid-template-columns: 1fr; }
@@ -1736,8 +1929,25 @@ footer .f-mono {
   footer { flex-direction: column; text-align: center; }
 }
 @media (max-width: 600px) {
+  .hero { padding-top: 5.25rem; }
+  .hero-body { font-size: .95rem; line-height: 1.55; }
+  .hero-result { font-size: .82rem; }
+  .hero-small-note,
+  .hero-outcomes,
+  .hero-pills,
+  .pipeline-mobile { display: none; }
+  .hero-btns { margin-bottom: 1.4rem; }
+  .btn-primary,
+  .btn-secondary { width: 100%; text-align: center; }
+  .report-card { border-radius: 16px; }
+  .rc-body { padding: 1rem; }
+  .rc-models,
+  .rc-orbit,
+  .rc-note { display: none; }
+  .rc-verdict-badge { width: 68px; height: 68px; font-size: .92rem; }
   .use-grid { grid-template-columns: 1fr; }
   .pilot-grid { grid-template-columns: 1fr; }
+  .scenario-carousel { grid-template-columns: none; grid-auto-columns: minmax(255px, 86vw); }
   .trust-grid { grid-template-columns: 1fr; }
   .roadmap-grid { grid-template-columns: 1fr; }
   .cta-brief ol { grid-template-columns: 1fr; }
@@ -1749,6 +1959,9 @@ footer .f-mono {
   .rc-orbit { grid-template-columns: 1fr; }
   .artifact-rail { grid-auto-columns: minmax(255px, 88vw); }
   .diagnostic-board { grid-template-columns: 1fr; }
+  .pipeline-metrics { grid-template-columns: 1fr; }
+  .ba-switch { grid-template-columns: 1fr; }
+  .report-table-row { grid-template-columns: 1fr; }
   .qualifier-row { grid-template-columns: 1fr; }
   .team-points { grid-template-columns: 1fr; }
   .format-summary { grid-template-columns: 1fr; }
@@ -1770,9 +1983,9 @@ footer .f-mono {
 <nav>
   <a href="#" class="logo">Космо<span class="dot">·</span><span class="rag">РАГ</span></a>
   <ul>
-    <li><a href="#for-whom">Для кого</a></li>
+    <li><a href="#flight-check">Диагностика</a></li>
+    <li><a href="#deliverables">Отчёт</a></li>
     <li><a href="#scenarios">Сценарии</a></li>
-    <li><a href="#razbor">Разбор</a></li>
     <li><a href="#cta">Контакт</a></li>
   </ul>
   <a href="#cta" class="nav-cta">Запросить разбор</a>
@@ -1789,11 +2002,11 @@ footer .f-mono {
       <div class="pulse-dot"></div>
       AI-разбор · 3–5 дней · до закупки GPU
     </div>
-    <h1>Не покупайте сервер<br>под ИИ <em>вслепую</em></h1>
+    <h1>Не покупайте GPU,<br>пока не увидите <em>отчёт</em></h1>
     <p class="hero-body">
-      За 3–5 дней проверим на ваших документах, какие задачи реально может решить небольшая локальная LLM, и дадим технический вывод: покупать GPU, менять архитектуру или не тратить деньги.
+      За 3–5 дней проверим ваши документы, локальные модели, качество поиска, задержку и VRAM — и дадим решение: GO / CHANGE / NO-GO.
     </p>
-    <p class="hero-result"><strong>Итог разбора:</strong> покупать GPU, менять архитектуру или остановиться без лишних затрат.</p>
+    <p class="hero-result"><strong>Итог диагностики:</strong> покупать GPU, менять архитектуру или остановиться без лишних затрат.</p>
     <p class="hero-small-note">3–5 дней — при готовом корпусе документов и согласованном доступе к данным.</p>
     <div class="hero-outcomes">
       <div class="hero-outcomes-title">За 3–5 дней вы получите</div>
@@ -1813,7 +2026,7 @@ footer .f-mono {
     </div>
     <div class="hero-btns">
       <a href="#cta" class="btn-primary">Запросить AI-разбор</a>
-      <a href="#scenarios" class="btn-secondary">Посмотреть сценарии</a>
+      <a href="#deliverables" class="btn-secondary">Посмотреть отчёт</a>
     </div>
 
     <!-- mobile pipeline -->
@@ -1831,7 +2044,7 @@ footer .f-mono {
   </div>
 
   <!-- REPORT CARD -->
-  <div style="position:relative;z-index:1">
+  <div class="hero-dashboard" style="position:relative;z-index:1">
     <div class="report-card">
       <div class="rc-header">
         <div class="rc-dots">
@@ -1839,82 +2052,120 @@ footer .f-mono {
           <div class="rc-dot y"></div>
           <div class="rc-dot g"></div>
         </div>
-        <div class="rc-title">космораг · pilot report</div>
-        <div class="rc-status">mission control</div>
+        <div class="rc-title">КосмоРАГ · пилотный отчёт</div>
+        <div class="rc-status">пульт запуска</div>
       </div>
       <div class="rc-body">
-        <div class="rc-verdict">
-          <div class="rc-verdict-badge">GO</div>
+        <div class="rc-verdict change">
+          <div class="rc-verdict-badge">CHANGE</div>
           <div>
-            <h3>AI Audit Dashboard</h3>
-            <p>3 из 5 сценариев проходят порог качества. Железо можно планировать, но после уточнения нагрузки и прав доступа.</p>
+            <h3>AI-диагностика контура</h3>
+            <p>Поиск работает, но OCR и права доступа требуют доработки до закупки железа.</p>
           </div>
         </div>
-        <div class="rc-demo-note"><span>demo:</span> цифры в карточке — пример структуры отчёта, а не замеренный кейс.</div>
+        <div class="rc-demo-note"><span>демо:</span> цифры в карточке — пример структуры отчёта, а не замеренный кейс.</div>
         <div class="rc-scenarios">
           <div class="rc-scenario">
-            <div><strong>Scenario 1 · поиск по НТД</strong><span>источник найден, ответ воспроизводим</span></div>
+            <div><strong>Сценарий 1 · поиск по НТД</strong><span>источник найден, ответ воспроизводим</span></div>
             <div class="status-pill go">GO</div>
           </div>
           <div class="rc-scenario">
-            <div><strong>Scenario 2 · ответы по регламентам</strong><span>нужны права доступа и OCR</span></div>
+            <div><strong>Сценарий 2 · ответы по регламентам</strong><span>нужны права доступа и OCR</span></div>
             <div class="status-pill change">CHANGE</div>
           </div>
           <div class="rc-scenario">
-            <div><strong>Scenario 3 · свободный чат</strong><span>нет стабильного источника</span></div>
+            <div><strong>Сценарий 3 · свободный чат</strong><span>нет стабильного источника</span></div>
             <div class="status-pill stop">NO-GO</div>
           </div>
         </div>
         <div class="rc-kpi-grid">
           <div class="rc-kpi">
-            <div class="rc-kpi-label">source match</div>
-            <div class="rc-kpi-value green">84%</div>
+            <div class="rc-kpi-label">попадание в источник</div>
+            <div class="rc-kpi-value green" data-count="84" data-suffix="%">84%</div>
           </div>
           <div class="rc-kpi">
-            <div class="rc-kpi-label">p95 latency</div>
-            <div class="rc-kpi-value accent">6.8s</div>
+            <div class="rc-kpi-label">p95 задержка</div>
+            <div class="rc-kpi-value accent" data-count="6.8" data-decimals="1" data-suffix="s">6.8s</div>
           </div>
           <div class="rc-kpi">
-            <div class="rc-kpi-label">gpu target</div>
+            <div class="rc-kpi-label">целевой GPU</div>
             <div class="rc-kpi-value">24–32GB</div>
           </div>
         </div>
         <div class="rc-bars">
           <div class="rc-bar-row">
-            <span>retrieval</span>
+            <span>поиск</span>
             <div class="rc-bar-track"><div class="rc-bar-fill" style="width:86%"></div></div>
             <span>86%</span>
           </div>
           <div class="rc-bar-row">
-            <span>answerability</span>
+            <span>качество ответа</span>
             <div class="rc-bar-track"><div class="rc-bar-fill" style="width:72%"></div></div>
             <span>72%</span>
           </div>
           <div class="rc-bar-row">
-            <span>risk level</span>
+            <span>уровень риска</span>
             <div class="rc-bar-track"><div class="rc-bar-fill" style="width:38%;background:linear-gradient(90deg,var(--red),var(--accent))"></div></div>
-            <span>medium</span>
+            <span>средний</span>
           </div>
         </div>
         <div class="rc-models">
           <div class="rc-model-row">
-            <span class="rc-model-name">local model A</span><span>лучше по RAG</span><span class="rc-chip good">shortlist</span>
+            <span class="rc-model-name">локальная модель A</span><span>лучше по RAG</span><span class="rc-chip good">в список</span>
           </div>
           <div class="rc-model-row">
-            <span class="rc-model-name">local model B</span><span>быстрее</span><span class="rc-chip">compare</span>
+            <span class="rc-model-name">локальная модель B</span><span>быстрее</span><span class="rc-chip">сравнить</span>
           </div>
           <div class="rc-model-row">
-            <span class="rc-model-name">API baseline*</span><span>только согласованные / обезличенные данные</span><span class="rc-chip">optional</span>
+            <span class="rc-model-name">контрольная проверка*</span><span>только согласованные / обезличенные данные</span><span class="rc-chip">опционально</span>
           </div>
         </div>
         <div class="rc-orbit">
-          <div>local</div>
-          <div>no external API</div>
-          <div>source-bound</div>
-          <div>VRAM tested</div>
+          <div>локально</div>
+          <div>без внешних сервисов</div>
+          <div>с источниками</div>
+          <div>VRAM проверена</div>
         </div>
-        <div class="rc-note">Идея пилота: сначала измеряем качество и нагрузку, потом решаем, стоит ли покупать GPU. *External API baseline — только на обезличенных или отдельно согласованных данных.</div>
+        <div class="rc-note">Идея пилота: сначала измеряем качество и нагрузку, потом решаем, стоит ли покупать GPU. *Контрольная проверка — только на обезличенных или отдельно согласованных данных.</div>
       </div>
+    </div>
+  </div>
+  <div class="launch-status-strip">
+    <div class="launch-card go">
+      <strong>GO</strong>
+      <p>Сценарий проходит порог качества, можно планировать закупку и внедрение.</p>
+    </div>
+    <div class="launch-card change">
+      <strong>CHANGE</strong>
+      <p>Идея полезна, но архитектуру, данные или права доступа нужно доработать.</p>
+    </div>
+    <div class="launch-card stop">
+      <strong>NO-GO</strong>
+      <p>Железо покупать рано: качество или контекст не подтверждены тестами.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHY FLIGHT CHECK -->
+<section id="flight-check">
+  <div class="s-eyebrow">// перед закупкой GPU</div>
+  <h2 class="s-title">Почему нельзя покупать GPU вслепую</h2>
+  <p class="s-sub">Проверка нужна до бюджета, закупки и внедрения: главный риск не в модели, а в неподтверждённой архитектуре.</p>
+  <div class="risk-panel">
+    <div class="risk-card">
+      <div class="risk-label">MONEY</div>
+      <h3>Ошибка архитектуры дороже железа</h3>
+      <p>GPU-сервер стоит дорого, но ещё дороже — купить его под сценарий, который не проходит метрики качества.</p>
+    </div>
+    <div class="risk-card">
+      <div class="risk-label">QUALITY</div>
+      <h3>Красивый ответ не равен правильному источнику</h3>
+      <p>Локальная LLM может звучать уверенно, но не находить нужный документ, страницу или контекст для ответа.</p>
+    </div>
+    <div class="risk-card">
+      <div class="risk-label">CONTOUR</div>
+      <h3>Закрытые документы нельзя просто отправить наружу</h3>
+      <p>Проверяем локальный контур: документы, индекс, модель и источники остаются в согласованной среде.</p>
     </div>
   </div>
 </section>
@@ -1942,12 +2193,12 @@ footer .f-mono {
     <div class="roadmap-card">
       <div class="roadmap-day">день 3</div>
       <h4>Поиск и модели</h4>
-      <p>Собираем прототип, тестируем retrieval, reranker и локальные модели.</p>
+      <p>Собираем прототип, тестируем поиск, ранжирование и локальные модели.</p>
     </div>
     <div class="roadmap-card">
       <div class="roadmap-day">день 4</div>
       <h4>Метрики и нагрузка</h4>
-      <p>Замеряем source match, latency, VRAM, слабые места и отказы.</p>
+      <p>Замеряем попадание в источник, задержку, VRAM, слабые места и отказы.</p>
     </div>
     <div class="roadmap-card">
       <div class="roadmap-day">день 5</div>
@@ -1986,7 +2237,7 @@ footer .f-mono {
     <div class="artifact-card">
       <div class="artifact-num">ARTIFACT_05</div>
       <h3>Риски и ограничения</h3>
-      <p>OCR, права доступа, качество корпуса, нагрузка, latency и места, где модель должна отказываться.</p>
+      <p>OCR, права доступа, качество корпуса, нагрузка, задержка и места, где модель должна отказываться.</p>
     </div>
     <div class="artifact-card">
       <div class="artifact-num">ARTIFACT_06</div>
@@ -2004,21 +2255,21 @@ footer .f-mono {
   <div class="report-showcase">
     <div class="report-list">
       <div class="report-list-item"><span>1</span><div><strong>Таблица сценариев</strong><p>Для каждой задачи фиксируем статус GO, CHANGE или NO-GO.</p></div></div>
-      <div class="report-list-item"><span>2</span><div><strong>Метрики качества</strong><p>Retrieval, answerability, source match, latency и отказы от ответа.</p></div></div>
+      <div class="report-list-item"><span>2</span><div><strong>Метрики качества</strong><p>Поиск, качество ответа, попадание в источник, задержка и отказы от ответа.</p></div></div>
       <div class="report-list-item"><span>3</span><div><strong>Риски внедрения</strong><p>Данные, OCR, права доступа, обновление корпуса и нагрузка.</p></div></div>
       <div class="report-list-item"><span>4</span><div><strong>Требования к железу</strong><p>GPU, VRAM, RAM, диск и ограничения по числу пользователей.</p></div></div>
       <div class="report-list-item"><span>5</span><div><strong>Решение для руководства</strong><p>Покупать GPU, менять архитектуру или не тратить бюджет.</p></div></div>
     </div>
     <div class="report-mock">
       <div class="report-mock-head">
-        <span>КосмоРАГ · pilot report</span>
+        <span>КосмоРАГ · пилотный отчёт</span>
         <span>decision matrix</span>
       </div>
       <div class="report-table">
-        <div class="report-table-row"><strong>Поиск по НТД</strong><span>source match 84%</span><div class="status-pill go">GO</div></div>
+        <div class="report-table-row"><strong>Поиск по НТД</strong><span>попадание 84%</span><div class="status-pill go">GO</div></div>
         <div class="report-table-row"><strong>Ответы по регламентам</strong><span>OCR / права</span><div class="status-pill change">CHANGE</div></div>
         <div class="report-table-row"><strong>Свободный чат</strong><span>нет источника</span><div class="status-pill stop">NO-GO</div></div>
-        <div class="report-table-row"><strong>Требования к железу</strong><span>P95 latency 6.8s</span><div class="status-pill go">24–32 GB</div></div>
+        <div class="report-table-row"><strong>Требования к железу</strong><span>P95 задержка 6.8s</span><div class="status-pill go">24–32 GB</div></div>
       </div>
     </div>
   </div>
@@ -2219,7 +2470,7 @@ footer .f-mono {
   <div class="pilot-examples">
     <h3>Примеры задач для пилота</h3>
     <p class="sub">Чтобы ЛПР быстрее узнал свой процесс, сценарии формулируем не абстрактно, а через отдел и документы.</p>
-    <div class="pilot-grid">
+    <div class="pilot-grid scenario-carousel">
       <div class="pilot-card">
         <strong>Производство</strong>
         <p>Поиск по НТД, регламентам, инструкциям, технологическим картам.</p>
@@ -2320,8 +2571,8 @@ footer .f-mono {
 <!-- HOW IT WORKS -->
 <section id="how" class="bg2">
   <div class="s-eyebrow">// механика</div>
-  <h2 class="s-title">Как работает КосмоРАГ</h2>
-  <p class="s-sub">Прозрачная цепочка без магии. Каждый шаг измеряется и может быть заменён.</p>
+  <h2 class="s-title">Как проходит диагностика</h2>
+  <p class="s-sub">Документы проходят через поиск, локальную модель, источники и метрики. На выходе — GO / CHANGE / NO-GO.</p>
   <div class="flow-track">
     <div class="flow-step">
       <div class="flow-box">
@@ -2329,7 +2580,7 @@ footer .f-mono {
         <div class="flow-ico fbi-blue">
           <svg viewBox="0 0 16 16"><path d="M3 2h7l3 3v9H3V2z"/><path d="M10 2v3h3"/></svg>
         </div>
-        <div class="flow-box-title">Данные</div>
+        <div class="flow-box-title">PDF / DOCX</div>
         <div class="flow-box-sub">PDF · DOCX<br>TXT · HTML</div>
       </div>
     </div>
@@ -2340,8 +2591,8 @@ footer .f-mono {
         <div class="flow-ico fbi-blue">
           <svg viewBox="0 0 16 16"><rect x="2" y="4" width="12" height="9" rx="1.5"/><path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/></svg>
         </div>
-        <div class="flow-box-title">Индексация</div>
-        <div class="flow-box-sub">vector + lexical<br>reranker-ready</div>
+        <div class="flow-box-title">OCR / chunks</div>
+        <div class="flow-box-sub">векторный + текстовый<br>готово к ранжированию</div>
       </div>
     </div>
     <div class="flow-arrow"><div class="flow-arrow-line" style="background:linear-gradient(90deg,var(--border2),rgba(168,85,247,.5))"><span style="position:absolute;right:-1px;top:-3px;border:4px solid transparent;border-left:5px solid rgba(168,85,247,.5)"></span></div></div>
@@ -2351,8 +2602,8 @@ footer .f-mono {
         <div class="flow-ico fbi-purple">
           <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4"/><path d="M10.5 10.5L14 14"/></svg>
         </div>
-        <div class="flow-box-title">Retrieval</div>
-        <div class="flow-box-sub">hybrid search<br>reranker</div>
+        <div class="flow-box-title">Hybrid search</div>
+        <div class="flow-box-sub">гибридный поиск<br>ранжирование</div>
       </div>
     </div>
     <div class="flow-arrow"><div class="flow-arrow-line" style="background:linear-gradient(90deg,var(--border2),rgba(168,85,247,.5))"><span style="position:absolute;right:-1px;top:-3px;border:4px solid transparent;border-left:5px solid rgba(168,85,247,.5)"></span></div></div>
@@ -2362,7 +2613,7 @@ footer .f-mono {
         <div class="flow-ico fbi-purple">
           <svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M5 7h6M5 10h4"/></svg>
         </div>
-        <div class="flow-box-title">Small LLM</div>
+        <div class="flow-box-title">Local LLM</div>
         <div class="flow-box-sub" style="color:var(--purple)">локально<br>VRAM по задаче</div>
       </div>
     </div>
@@ -2373,7 +2624,7 @@ footer .f-mono {
         <div class="flow-ico fbi-blue">
           <svg viewBox="0 0 16 16"><path d="M2 5h12M2 8h8M2 11h6"/></svg>
         </div>
-        <div class="flow-box-title">Ответ</div>
+        <div class="flow-box-title">Sources</div>
         <div class="flow-box-sub">источник<br>context match</div>
       </div>
     </div>
@@ -2384,10 +2635,16 @@ footer .f-mono {
         <div class="flow-ico fbi-green">
           <svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8l2 2 4-4"/></svg>
         </div>
-        <div class="flow-box-title">Оценка</div>
-        <div class="flow-box-sub" style="color:var(--green)">метрики<br>качества</div>
+        <div class="flow-box-title">Verdict</div>
+        <div class="flow-box-sub" style="color:var(--green)">GO · CHANGE<br>NO-GO</div>
       </div>
     </div>
+  </div>
+  <div class="pipeline-metrics">
+    <div class="pipeline-metric"><span>попадание</span><strong>84%</strong></div>
+    <div class="pipeline-metric"><span>качество ответа</span><strong>72%</strong></div>
+    <div class="pipeline-metric"><span>p95 задержка</span><strong>6.8s</strong></div>
+    <div class="pipeline-metric"><span>gpu target</span><strong>24–32 GB</strong></div>
   </div>
 </section>
 
@@ -2396,6 +2653,12 @@ footer .f-mono {
   <div class="s-eyebrow">// эффект пилота</div>
   <h2 class="s-title">До пилота и после</h2>
   <p class="s-sub">Главный результат — не прототип. Это понимание: идти дальше или нет.</p>
+  <div class="ba-switch">
+    <div class="ba-switch-item"><span>ДО</span><strong>хаос документов</strong><em>→ список сценариев</em></div>
+    <div class="ba-switch-item"><span>ДО</span><strong>вера в AI</strong><em>→ метрики качества</em></div>
+    <div class="ba-switch-item"><span>ДО</span><strong>хотим GPU</strong><em>→ знаем VRAM/RAM</em></div>
+    <div class="ba-switch-item"><span>ДО</span><strong>нет аргументов</strong><em>→ отчёт для руководства</em></div>
+  </div>
   <div class="ba-grid">
     <div class="ba-col before">
       <h3>
@@ -2452,12 +2715,12 @@ footer .f-mono {
   <h2 class="s-title">Сначала сценарии. Потом железо.</h2>
   <p class="s-sub">Каждый пилот отвечает на конкретные вопросы перед инвестицией.</p>
   <div class="diagnostic-board" style="margin-bottom:1rem">
-    <div class="diag-item"><div class="mark">[✓]</div><h3>Retrieval нашёл правильный источник?</h3><p>Проверяем не красоту ответа, а то, найден ли нужный документ и фрагмент.</p></div>
+    <div class="diag-item"><div class="mark">[✓]</div><h3>Поиск нашёл правильный источник?</h3><p>Проверяем не красоту ответа, а то, найден ли нужный документ и фрагмент.</p></div>
     <div class="diag-item"><div class="mark">[✓]</div><h3>Ответ опирается на документ?</h3><p>Смотрим, можно ли воспроизвести вывод по найденному контексту.</p></div>
     <div class="diag-item"><div class="mark">[✓]</div><h3>Модель умеет отказаться?</h3><p>Если источника нет, система должна показать низкую достаточность контекста.</p></div>
-    <div class="diag-item"><div class="mark">[✓]</div><h3>P95 latency приемлемая?</h3><p>Измеряем скорость ответа на реальных запросах и планируем нагрузку.</p></div>
+    <div class="diag-item"><div class="mark">[✓]</div><h3>P95 задержка приемлемая?</h3><p>Измеряем скорость ответа на реальных запросах и планируем нагрузку.</p></div>
     <div class="diag-item"><div class="mark">[✓]</div><h3>Влезает ли в 24/32 GB VRAM?</h3><p>Считаем память по модели, контексту и одновременным пользователям.</p></div>
-    <div class="diag-item"><div class="mark">[✓]</div><h3>Есть ли деградация при нагрузке?</h3><p>Смотрим слабые места retrieval, reranker и локального инференса.</p></div>
+    <div class="diag-item"><div class="mark">[✓]</div><h3>Есть ли деградация при нагрузке?</h3><p>Смотрим слабые места поиска, ранжирования и локального инференса.</p></div>
   </div>
   <div class="prebuy-grid">
     <div class="prebuy-card">
@@ -2472,13 +2735,13 @@ footer .f-mono {
     </div>
     <div class="prebuy-card">
       <div class="pq">ВОПРОС_03</div>
-      <div class="pa">Какая latency в вашем сценарии?</div>
+      <div class="pa">Какая задержка в вашем сценарии?</div>
       <div class="pn">Latency замеряется на пилоте с реальными запросами. P50/P95 для вашей нагрузки.</div>
     </div>
     <div class="prebuy-card">
       <div class="pq">ВОПРОС_04</div>
       <div class="pa">Сколько пользователей одновременно?</div>
-      <div class="pn">Нагрузочный тест с vLLM на реальном числе concurrent users вашего отдела.</div>
+      <div class="pn">Нагрузочный тест локального инференса на реальном числе одновременных пользователей вашего отдела.</div>
     </div>
     <div class="prebuy-card">
       <div class="pq">ВОПРОС_05</div>
@@ -2519,11 +2782,11 @@ footer .f-mono {
     </div>
     <div class="team-card">
       <h3>Кто делает разбор?</h3>
-      <p>Инженеры, которые собирают локальные RAG-системы: документы, OCR, retrieval, reranker, локальный инференс, GPU-нагрузка и метрики качества.</p>
+      <p>Инженеры, которые собирают локальные RAG-системы: документы, OCR, поиск, ранжирование, локальный инференс, GPU-нагрузка и метрики качества.</p>
       <div class="team-points">
         <div><span>✓</span>закрытый контур</div>
         <div><span>✓</span>документы и OCR</div>
-        <div><span>✓</span>retrieval / reranker / LLM</div>
+        <div><span>✓</span>поиск / ранжирование / модель</div>
         <div><span>✓</span>GPU-инференс</div>
         <div><span>✓</span>метрики качества</div>
         <div><span>✓</span>честный no-go</div>
@@ -2547,7 +2810,7 @@ footer .f-mono {
     <div class="trust-card">
       <div class="trust-num">02</div>
       <h4>Понимаем ограничения маленьких LLM</h4>
-      <p>Не обещаем “ИИ обо всём”: отдельно проверяем retrieval, модель, контекст, latency и отказ от ответа.</p>
+      <p>Не обещаем “ИИ обо всём”: отдельно проверяем поиск, модель, контекст, задержку и отказ от ответа.</p>
     </div>
     <div class="trust-card">
       <div class="trust-num">03</div>
@@ -2562,7 +2825,7 @@ footer .f-mono {
     <div class="trust-card">
       <div class="trust-num">05</div>
       <h4>Даём инженерный отчёт</h4>
-      <p>На выходе: модель, качество, latency, требования к железу, риски и решение go / no-go.</p>
+      <p>На выходе: модель, качество, задержка, требования к железу, риски и решение go / no-go.</p>
     </div>
     <div class="trust-card">
       <div class="trust-num">06</div>
@@ -2598,7 +2861,7 @@ footer .f-mono {
           <div class="rt-num">3</div>
           <div class="rt-body">
             <h4>Подбираем и тестируем модели</h4>
-            <p>Запускаем 2–3 модели на ваших запросах. Замеряем качество, latency, потребление памяти.</p>
+            <p>Запускаем 2–3 модели на ваших запросах. Замеряем качество, задержку, потребление памяти.</p>
           </div>
         </div>
         <div class="rt-step">
@@ -2645,7 +2908,7 @@ footer .f-mono {
         </li>
         <li>
           <div class="deliv-check">✓</div>
-          <div><strong>Сравнение моделей</strong> — качество / latency / VRAM на ваших данных</div>
+          <div><strong>Сравнение моделей</strong> — качество / задержка / VRAM на ваших данных</div>
         </li>
         <li>
           <div class="deliv-check">✓</div>
@@ -2666,11 +2929,11 @@ footer .f-mono {
   <div class="cta-glow"></div>
   <div style="position:relative;z-index:1">
     <div class="cta-badge"><div class="pulse-dot"></div> принимаем заявки на разбор</div>
-    <h2 class="cta-title">Стоит ли вашей компании<br>покупать сервер под локальный ИИ?</h2>
-    <p class="cta-sub">За 3–5 дней проверим 3–5 сценариев на ваших документах и дадим вывод: покупать GPU, менять архитектуру или остановиться.</p>
+    <h2 class="cta-title">Проверьте, готов ли ваш AI-контур к запуску</h2>
+    <p class="cta-sub">За 3–5 дней проведём диагностику на ваших документах и дадим решение: GO / CHANGE / NO-GO.</p>
     <a href="https://t.me/yuriiivanov36" class="cta-tg" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.56 8.1l-2.02 9.52c-.15.66-.54.82-1.09.51l-3-2.21-1.45 1.4c-.16.16-.3.3-.61.3l.21-3.06 5.52-4.99c.24-.21-.05-.33-.37-.12L6.28 14.3 3.32 13.4c-.66-.2-.67-.66.14-.98l10.88-4.2c.55-.2 1.03.13.85.98l-.63-.1z"/></svg>
-      Проверить, стоит ли покупать GPU
+      Запросить AI-разбор
     </a>
     <div class="cta-alt">или <a href="mailto:yurii.ivanov.2000@mail.ru">отправить письмо</a> — ответим в течение дня</div>
     <div class="cta-brief">
@@ -2696,11 +2959,45 @@ footer .f-mono {
 
 <script>
 const field = document.getElementById('stars');
-for (let i = 0; i < 90; i++) {
-  const s = document.createElement('div');
-  s.className = 'star';
-  s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2.5+Math.random()*6}s;--dl:${Math.random()*8}s;--b:${.1+Math.random()*.4};`;
-  field.appendChild(s);
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if (field) {
+  for (let i = 0; i < 90; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2.5+Math.random()*6}s;--dl:${Math.random()*8}s;--b:${.1+Math.random()*.4};`;
+    field.appendChild(s);
+  }
+}
+
+if (!reduceMotion) {
+  const counters = document.querySelectorAll('[data-count]');
+  const animateCounter = (el) => {
+    const target = Number(el.dataset.count);
+    const decimals = Number(el.dataset.decimals || 0);
+    const suffix = el.dataset.suffix || '';
+    const startedAt = performance.now();
+    const duration = 900;
+
+    const tick = (now) => {
+      const progress = Math.min((now - startedAt) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = `${(target * eased).toFixed(decimals)}${suffix}`;
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+
+    requestAnimationFrame(tick);
+  };
+
+  const counterObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      animateCounter(entry.target);
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.6 });
+
+  counters.forEach((counter) => counterObserver.observe(counter));
 }
 </script>
 </body>
