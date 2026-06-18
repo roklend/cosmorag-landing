@@ -400,6 +400,73 @@ nav ul a:hover { color: var(--text); }
   font-size: .72rem;
   line-height: 1.55;
 }
+.rc-scenarios {
+  display: grid;
+  gap: .45rem;
+  margin-bottom: 1rem;
+}
+.rc-scenario {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: .75rem;
+  padding: .58rem .7rem;
+  border: 1px solid rgba(77,195,255,.11);
+  border-radius: 10px;
+  background: rgba(255,255,255,.026);
+}
+.rc-scenario strong {
+  display: block;
+  font-size: .78rem;
+  margin-bottom: .08rem;
+}
+.rc-scenario span {
+  color: var(--muted);
+  font-size: .68rem;
+}
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: .18rem .45rem;
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+.status-pill.go {
+  color: var(--green);
+  background: rgba(34,197,94,.10);
+  border: 1px solid rgba(34,197,94,.28);
+}
+.status-pill.change {
+  color: #FBBF24;
+  background: rgba(251,191,36,.10);
+  border: 1px solid rgba(251,191,36,.28);
+}
+.status-pill.stop {
+  color: var(--red);
+  background: rgba(248,113,113,.10);
+  border: 1px solid rgba(248,113,113,.28);
+}
+.rc-orbit {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .45rem;
+  margin-top: .85rem;
+}
+.rc-orbit div {
+  border: 1px solid rgba(77,195,255,.14);
+  border-radius: 999px;
+  padding: .28rem .45rem;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .54rem;
+  text-align: center;
+  background: rgba(77,195,255,.035);
+}
 .rc-demo-note {
   margin: -.35rem 0 1rem;
   color: var(--dim);
@@ -897,6 +964,216 @@ section { padding: 5.5rem 3rem; }
   font-size: .72rem;
   color: var(--muted);
   line-height: 1.5;
+}
+
+/* ── DELIVERABLES / REPORT / DIAGNOSTICS ── */
+.artifact-rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(240px, 1fr);
+  gap: .9rem;
+  overflow-x: auto;
+  padding: .2rem .1rem .8rem;
+  scroll-snap-type: x proximity;
+}
+.artifact-card {
+  scroll-snap-align: start;
+  min-height: 178px;
+  display: flex;
+  flex-direction: column;
+  gap: .7rem;
+  padding: 1.35rem;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+}
+.artifact-num {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent);
+  font-size: .62rem;
+  letter-spacing: .1em;
+}
+.artifact-card h3 {
+  font-size: .98rem;
+}
+.artifact-card p {
+  color: var(--muted);
+  font-size: .8rem;
+  line-height: 1.55;
+}
+.report-showcase {
+  display: grid;
+  grid-template-columns: .9fr 1.1fr;
+  gap: 2rem;
+  align-items: stretch;
+}
+.report-list {
+  display: grid;
+  gap: .8rem;
+}
+.report-list-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .75rem;
+  align-items: start;
+  padding: .9rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255,255,255,.032);
+}
+.report-list-item span {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  background: var(--accent-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem;
+}
+.report-list-item strong {
+  display: block;
+  margin-bottom: .12rem;
+}
+.report-list-item p {
+  color: var(--muted);
+  font-size: .8rem;
+  line-height: 1.5;
+}
+.report-mock {
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(17,24,39,.78), rgba(8,18,31,.72));
+  backdrop-filter: blur(16px);
+  box-shadow: var(--glow);
+  padding: 1.25rem;
+}
+.report-mock-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem;
+  color: var(--dim);
+}
+.report-table {
+  display: grid;
+  gap: .55rem;
+}
+.report-table-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: .65rem;
+  align-items: center;
+  padding: .72rem .8rem;
+  border: 1px solid rgba(77,195,255,.12);
+  border-radius: 12px;
+  background: rgba(255,255,255,.03);
+  font-size: .78rem;
+}
+.report-table-row span {
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .58rem;
+}
+.diagnostic-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .85rem;
+}
+.diag-item {
+  min-height: 132px;
+  padding: 1.05rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+}
+.diag-item .mark {
+  color: var(--green);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: .55rem;
+}
+.diag-item h3 {
+  font-size: .9rem;
+  margin-bottom: .3rem;
+}
+.diag-item p {
+  color: var(--muted);
+  font-size: .78rem;
+  line-height: 1.5;
+}
+.start-qualifier {
+  display: grid;
+  grid-template-columns: .92fr 1.08fr;
+  gap: 1.2rem;
+  align-items: stretch;
+}
+.qualifier-panel,
+.team-card {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  padding: 1.35rem;
+}
+.qualifier-row {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: .9rem;
+  align-items: center;
+  padding: .75rem 0;
+  border-bottom: 1px solid rgba(77,195,255,.10);
+}
+.qualifier-row:last-child { border-bottom: 0; }
+.qualifier-row strong {
+  font-size: .82rem;
+}
+.qualifier-options {
+  display: flex;
+  gap: .45rem;
+  flex-wrap: wrap;
+}
+.qualifier-options span {
+  border: 1px solid rgba(77,195,255,.18);
+  border-radius: 999px;
+  padding: .28rem .65rem;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem;
+  background: rgba(255,255,255,.028);
+}
+.qualifier-options span.active {
+  color: var(--accent);
+  border-color: rgba(77,195,255,.38);
+  background: var(--accent-dim);
+}
+.team-card h3 {
+  margin-bottom: .65rem;
+}
+.team-card p {
+  color: var(--muted);
+  font-size: .86rem;
+  line-height: 1.65;
+  margin-bottom: 1rem;
+}
+.team-points {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .5rem;
+}
+.team-points div {
+  color: var(--muted);
+  font-size: .78rem;
+}
+.team-points span {
+  color: var(--accent);
+  margin-right: .35rem;
 }
 
 /* ── DEMO ANSWER ── */
@@ -1447,6 +1724,10 @@ footer .f-mono {
   .roadmap-grid { grid-template-columns: 1fr 1fr; }
   .decision-grid { grid-template-columns: 1fr; }
   .rc-kpi-grid { grid-template-columns: 1fr 1fr; }
+  .rc-orbit { grid-template-columns: 1fr 1fr; }
+  .report-showcase { grid-template-columns: 1fr; }
+  .diagnostic-board { grid-template-columns: 1fr 1fr; }
+  .start-qualifier { grid-template-columns: 1fr; }
   .start-reqs ul { grid-template-columns: 1fr; }
   .demo-wrap { grid-template-columns: 1fr; }
   .ba-grid { grid-template-columns: 1fr; }
@@ -1464,8 +1745,22 @@ footer .f-mono {
   .hero-outcomes-grid { grid-template-columns: 1fr; }
   .rc-kpi-grid { grid-template-columns: 1fr; }
   .rc-verdict { grid-template-columns: 1fr; }
+  .rc-scenario { grid-template-columns: 1fr; }
+  .rc-orbit { grid-template-columns: 1fr; }
+  .artifact-rail { grid-auto-columns: minmax(255px, 88vw); }
+  .diagnostic-board { grid-template-columns: 1fr; }
+  .qualifier-row { grid-template-columns: 1fr; }
+  .team-points { grid-template-columns: 1fr; }
   .format-summary { grid-template-columns: 1fr; }
   .hero h1 { font-size: 1.75rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
 }
 </style>
 </head>
@@ -1526,7 +1821,7 @@ footer .f-mono {
       <div class="mob-flow">
         <div class="mob-step"><strong>Документы</strong>PDF/DOCX</div>
         <div class="mob-arrow">→</div>
-        <div class="mob-step"><strong>RAG-поиск</strong>FAISS+BM25</div>
+        <div class="mob-step"><strong>RAG-поиск</strong>hybrid search</div>
         <div class="mob-arrow">→</div>
         <div class="mob-step"><strong>Small LLM</strong>локально</div>
         <div class="mob-arrow">→</div>
@@ -1544,18 +1839,32 @@ footer .f-mono {
           <div class="rc-dot y"></div>
           <div class="rc-dot g"></div>
         </div>
-        <div class="rc-title">космораг · example report</div>
-        <div class="rc-status">example report</div>
+        <div class="rc-title">космораг · pilot report</div>
+        <div class="rc-status">mission control</div>
       </div>
       <div class="rc-body">
         <div class="rc-verdict">
           <div class="rc-verdict-badge">GO</div>
           <div>
-            <h3>Пример формата отчёта</h3>
+            <h3>AI Audit Dashboard</h3>
             <p>3 из 5 сценариев проходят порог качества. Железо можно планировать, но после уточнения нагрузки и прав доступа.</p>
           </div>
         </div>
         <div class="rc-demo-note"><span>demo:</span> цифры в карточке — пример структуры отчёта, а не замеренный кейс.</div>
+        <div class="rc-scenarios">
+          <div class="rc-scenario">
+            <div><strong>Scenario 1 · поиск по НТД</strong><span>источник найден, ответ воспроизводим</span></div>
+            <div class="status-pill go">GO</div>
+          </div>
+          <div class="rc-scenario">
+            <div><strong>Scenario 2 · ответы по регламентам</strong><span>нужны права доступа и OCR</span></div>
+            <div class="status-pill change">CHANGE</div>
+          </div>
+          <div class="rc-scenario">
+            <div><strong>Scenario 3 · свободный чат</strong><span>нет стабильного источника</span></div>
+            <div class="status-pill stop">NO-GO</div>
+          </div>
+        </div>
         <div class="rc-kpi-grid">
           <div class="rc-kpi">
             <div class="rc-kpi-label">source match</div>
@@ -1589,14 +1898,20 @@ footer .f-mono {
         </div>
         <div class="rc-models">
           <div class="rc-model-row">
-            <span class="rc-model-name">Qwen local</span><span>лучше по RAG</span><span class="rc-chip good">shortlist</span>
+            <span class="rc-model-name">local model A</span><span>лучше по RAG</span><span class="rc-chip good">shortlist</span>
           </div>
           <div class="rc-model-row">
-            <span class="rc-model-name">Gemma local</span><span>быстрее</span><span class="rc-chip">compare</span>
+            <span class="rc-model-name">local model B</span><span>быстрее</span><span class="rc-chip">compare</span>
           </div>
           <div class="rc-model-row">
             <span class="rc-model-name">API baseline*</span><span>только согласованные / обезличенные данные</span><span class="rc-chip">optional</span>
           </div>
+        </div>
+        <div class="rc-orbit">
+          <div>local</div>
+          <div>no external API</div>
+          <div>source-bound</div>
+          <div>VRAM tested</div>
         </div>
         <div class="rc-note">Идея пилота: сначала измеряем качество и нагрузку, потом решаем, стоит ли покупать GPU. *External API baseline — только на обезличенных или отдельно согласованных данных.</div>
       </div>
@@ -1638,6 +1953,73 @@ footer .f-mono {
       <div class="roadmap-day">день 5</div>
       <h4>Go / no-go отчёт</h4>
       <p>Даём решение: покупать GPU, менять архитектуру или не тратить бюджет.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DELIVERABLES -->
+<section class="bg2" id="deliverables">
+  <div class="s-eyebrow">// что получает клиент</div>
+  <h2 class="s-title">Артефакты, за которые платят</h2>
+  <p class="s-sub">Не “нейронка ради нейронки”, а набор материалов, который снижает неопределённость перед закупкой железа.</p>
+  <div class="artifact-rail">
+    <div class="artifact-card">
+      <div class="artifact-num">ARTIFACT_01</div>
+      <h3>Go / change / no-go отчёт</h3>
+      <p>Решение по каждому сценарию: запускать, менять архитектуру или остановиться без закупки GPU.</p>
+    </div>
+    <div class="artifact-card">
+      <div class="artifact-num">ARTIFACT_02</div>
+      <h3>Таблица моделей</h3>
+      <p>Сравнение 2–3 локальных моделей под ваши документы, контекст и ограничения.</p>
+    </div>
+    <div class="artifact-card">
+      <div class="artifact-num">ARTIFACT_03</div>
+      <h3>Требования к железу</h3>
+      <p>Оценка GPU, VRAM, RAM и диска после тестов, а не по абстрактной спецификации.</p>
+    </div>
+    <div class="artifact-card">
+      <div class="artifact-num">ARTIFACT_04</div>
+      <h3>Рабочие сценарии</h3>
+      <p>Список задач, где локальная LLM даёт измеримый результат на ваших данных.</p>
+    </div>
+    <div class="artifact-card">
+      <div class="artifact-num">ARTIFACT_05</div>
+      <h3>Риски и ограничения</h3>
+      <p>OCR, права доступа, качество корпуса, нагрузка, latency и места, где модель должна отказываться.</p>
+    </div>
+    <div class="artifact-card">
+      <div class="artifact-num">ARTIFACT_06</div>
+      <h3>Прототип на документах</h3>
+      <p>Проверяемый контур с вопросами, ответами, источниками и метриками достаточности контекста.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL REPORT -->
+<section>
+  <div class="s-eyebrow">// финальный отчёт</div>
+  <h2 class="s-title">Финальный отчёт — это не презентация про AI</h2>
+  <p class="s-sub">Это инженерный документ: что проверили, что сработало, где риски и какое решение принимать по железу.</p>
+  <div class="report-showcase">
+    <div class="report-list">
+      <div class="report-list-item"><span>1</span><div><strong>Таблица сценариев</strong><p>Для каждой задачи фиксируем статус GO, CHANGE или NO-GO.</p></div></div>
+      <div class="report-list-item"><span>2</span><div><strong>Метрики качества</strong><p>Retrieval, answerability, source match, latency и отказы от ответа.</p></div></div>
+      <div class="report-list-item"><span>3</span><div><strong>Риски внедрения</strong><p>Данные, OCR, права доступа, обновление корпуса и нагрузка.</p></div></div>
+      <div class="report-list-item"><span>4</span><div><strong>Требования к железу</strong><p>GPU, VRAM, RAM, диск и ограничения по числу пользователей.</p></div></div>
+      <div class="report-list-item"><span>5</span><div><strong>Решение для руководства</strong><p>Покупать GPU, менять архитектуру или не тратить бюджет.</p></div></div>
+    </div>
+    <div class="report-mock">
+      <div class="report-mock-head">
+        <span>КосмоРАГ · pilot report</span>
+        <span>decision matrix</span>
+      </div>
+      <div class="report-table">
+        <div class="report-table-row"><strong>Поиск по НТД</strong><span>source match 84%</span><div class="status-pill go">GO</div></div>
+        <div class="report-table-row"><strong>Ответы по регламентам</strong><span>OCR / права</span><div class="status-pill change">CHANGE</div></div>
+        <div class="report-table-row"><strong>Свободный чат</strong><span>нет источника</span><div class="status-pill stop">NO-GO</div></div>
+        <div class="report-table-row"><strong>Требования к железу</strong><span>P95 latency 6.8s</span><div class="status-pill go">24–32 GB</div></div>
+      </div>
     </div>
   </div>
 </section>
@@ -1959,7 +2341,7 @@ footer .f-mono {
           <svg viewBox="0 0 16 16"><rect x="2" y="4" width="12" height="9" rx="1.5"/><path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/></svg>
         </div>
         <div class="flow-box-title">Индексация</div>
-        <div class="flow-box-sub">chunk · embed<br>FAISS + BM25</div>
+        <div class="flow-box-sub">vector + lexical<br>reranker-ready</div>
       </div>
     </div>
     <div class="flow-arrow"><div class="flow-arrow-line" style="background:linear-gradient(90deg,var(--border2),rgba(168,85,247,.5))"><span style="position:absolute;right:-1px;top:-3px;border:4px solid transparent;border-left:5px solid rgba(168,85,247,.5)"></span></div></div>
@@ -2069,11 +2451,19 @@ footer .f-mono {
   <div class="s-eyebrow">// что проверяем</div>
   <h2 class="s-title">Сначала сценарии. Потом железо.</h2>
   <p class="s-sub">Каждый пилот отвечает на конкретные вопросы перед инвестицией.</p>
+  <div class="diagnostic-board" style="margin-bottom:1rem">
+    <div class="diag-item"><div class="mark">[✓]</div><h3>Retrieval нашёл правильный источник?</h3><p>Проверяем не красоту ответа, а то, найден ли нужный документ и фрагмент.</p></div>
+    <div class="diag-item"><div class="mark">[✓]</div><h3>Ответ опирается на документ?</h3><p>Смотрим, можно ли воспроизвести вывод по найденному контексту.</p></div>
+    <div class="diag-item"><div class="mark">[✓]</div><h3>Модель умеет отказаться?</h3><p>Если источника нет, система должна показать низкую достаточность контекста.</p></div>
+    <div class="diag-item"><div class="mark">[✓]</div><h3>P95 latency приемлемая?</h3><p>Измеряем скорость ответа на реальных запросах и планируем нагрузку.</p></div>
+    <div class="diag-item"><div class="mark">[✓]</div><h3>Влезает ли в 24/32 GB VRAM?</h3><p>Считаем память по модели, контексту и одновременным пользователям.</p></div>
+    <div class="diag-item"><div class="mark">[✓]</div><h3>Есть ли деградация при нагрузке?</h3><p>Смотрим слабые места retrieval, reranker и локального инференса.</p></div>
+  </div>
   <div class="prebuy-grid">
     <div class="prebuy-card">
       <div class="pq">ВОПРОС_01</div>
       <div class="pa">Какие модели тестировать?</div>
-      <div class="pn">Локально доступные и коммерчески применимые модели подбираются под задачу: Qwen, Gemma, Mistral и другие. При необходимости сравниваем с внешними API как baseline.</div>
+      <div class="pn">Сравниваем 2–3 локальные модели под вашу задачу. Названия моделей фиксируем в технической части отчёта.</div>
     </div>
     <div class="prebuy-card">
       <div class="pq">ВОПРОС_02</div>
@@ -2098,7 +2488,46 @@ footer .f-mono {
     <div class="prebuy-card">
       <div class="pq">ВОПРОС_06</div>
       <div class="pa">Как хранить и обновлять индекс?</div>
-      <div class="pn">FAISS, SQLite или Postgres — зависит от объёма корпуса и частоты добавления документов.</div>
+      <div class="pn">Выбираем хранилище и стратегию обновления под объём корпуса, права доступа и частоту добавления документов.</div>
+    </div>
+  </div>
+</section>
+
+<!-- START QUALIFIER -->
+<section>
+  <div class="s-eyebrow">// готовность к старту</div>
+  <h2 class="s-title">Подходит ли задача для экспресс-разбора?</h2>
+  <p class="s-sub">Это не точный калькулятор стоимости, а быстрый квалификатор: есть ли исходные условия для пилота за 3–5 дней.</p>
+  <div class="start-qualifier">
+    <div class="qualifier-panel">
+      <div class="qualifier-row">
+        <strong>Документов</strong>
+        <div class="qualifier-options"><span>50</span><span class="active">500</span><span>5000+</span></div>
+      </div>
+      <div class="qualifier-row">
+        <strong>Типовых запросов</strong>
+        <div class="qualifier-options"><span>20</span><span class="active">50</span><span>100+</span></div>
+      </div>
+      <div class="qualifier-row">
+        <strong>Закрытый контур</strong>
+        <div class="qualifier-options"><span class="active">да</span><span>нет</span><span>частично</span></div>
+      </div>
+      <div class="qualifier-row">
+        <strong>Предварительно</strong>
+        <div class="qualifier-options"><span class="active">подходит для AI-разбора</span></div>
+      </div>
+    </div>
+    <div class="team-card">
+      <h3>Кто делает разбор?</h3>
+      <p>Инженеры, которые собирают локальные RAG-системы: документы, OCR, retrieval, reranker, локальный инференс, GPU-нагрузка и метрики качества.</p>
+      <div class="team-points">
+        <div><span>✓</span>закрытый контур</div>
+        <div><span>✓</span>документы и OCR</div>
+        <div><span>✓</span>retrieval / reranker / LLM</div>
+        <div><span>✓</span>GPU-инференс</div>
+        <div><span>✓</span>метрики качества</div>
+        <div><span>✓</span>честный no-go</div>
+      </div>
     </div>
   </div>
 </section>
